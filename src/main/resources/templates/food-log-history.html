@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>7-Day History - Retro Macros</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}" />
+</head>
+<body class="neon">
+<div th:replace="~{fragments/navbar :: authenticated-navbar}"></div>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📅 7-Day History</h1>
+        <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+
+    <div th:if="${foodLogs == null || foodLogs.isEmpty()}">
+        <p class="text-muted">No food logs found for the last 7 days.</p>
+    </div>
+
+    <div th:if="${foodLogs != null && !foodLogs.isEmpty()}">
+        <div th:each="date : ${dailyTotalsMap.keySet()}">
+            <div class="card neon mb-4">
+                <div class="card-header">
+                    <h4 th:text="${#temporals.format(date, 'EEEE, MMMM dd, yyyy')}">Date</h4>
+                    <div th:with="totals=${dailyTotalsMap.get(date)}">
+                        <strong>Daily Totals:</strong>
+                        <span th:text="${totals.get('calories')}">0</span> cal |
+                        <span th:text="${totals.get('protein')}">0</span>g P |
+                        <span th:text="${totals.get('carbs')}">0</span>g C |
+                        <span th:text="${totals.get('fat')}">0</span>g F
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-dark table-sm table-striped">
+                        <thead><tr><th>Time</th><th>Meal</th><th>Food</th><th>Cal</th><th>P</th><th>C</th><th>F</th></tr></thead>
+                        <tbody>
+                        <tr th:each="log : ${foodLogs}" th:if="${log.logDate.equals(date)}">
+                            <td th:text="${#temporals.format(log.timeLogged, 'h:mm a')}">8:00 AM</td>
+                            <td th:text="${log.mealName}">Breakfast</td>
+                            <td th:text="${log.foodDescription}">3 eggs, oatmeal</td>
+                            <td th:text="${log.calories}">0</td>
+                            <td th:text="${log.protein}">0</td>
+                            <td th:text="${log.carbs}">0</td>
+                            <td th:text="${log.fat}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

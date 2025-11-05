@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - Retro Macros</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}" />
+</head>
+<body class="neon">
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card neon">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-4 section-title">Sign In to Retro Macros</h2>
+                    <p class="text-muted mb-4">Sign in with your Google account to get started</p>
+                    <a href="/oauth2/authorization/google" class="btn btn-neon btn-lg"><i class="bi bi-google me-2"></i> Sign in with Google</a>
+                    <div class="mt-4">
+                        <a href="/home" class="text-muted"> <i class="bi bi-arrow-left me-1"></i> Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+</html>
+
+
+
+

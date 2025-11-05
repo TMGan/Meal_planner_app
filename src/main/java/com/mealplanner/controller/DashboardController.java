@@ -1,0 +1,64 @@
+package com.mealplanner.controller;
+
+import com.mealplanner.model.User;
+import com.mealplanner.repository.SavedMealPlanRepository;
+import com.mealplanner.service.FoodLogService;
+import com.mealplanner.model.FoodLog;
+import java.util.List;
+import java.util.Map;
+import com.mealplanner.repository.UserRepository;
+import com.mealplanner.service.UserFoodPreferencesService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class DashboardController {
+
+    private final UserRepository userRepository;
+    private final SavedMealPlanRepository mealPlanRepository;
+    private final FoodLogService foodLogService;
+    private final UserFoodPreferencesService preferencesService;
+
+    public DashboardController(UserRepository userRepository, SavedMealPlanRepository mealPlanRepository, FoodLogService foodLogService, UserFoodPreferencesService preferencesService) {
+        this.userRepository = userRepository;
+        this.mealPlanRepository = mealPlanRepository;
+        this.foodLogService = foodLogService;
+        this.preferencesService = preferencesService;
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard(@AuthenticationPrincipal OAuth2User principal, Model model) {
+        if (principal == null) return "redirect:/login";
+        String email = principal.getAttribute("email");
+        String googleId = principal.getAttribute("sub");
+        String name = principal.getAttribute("name");
+        String picture = principal.getAttribute("picture");
+        User user = null;
+        if (email != null) user = userRepository.findByEmail(email).orElse(null);
+        if (user == null && googleId != null) user = userRepository.findByGoogleId(googleId).orElse(null);
+        if (user == null) {
+            // Fallback: create user record if missing to avoid redirect loops
+            String em = (email != null) ? email : (googleId != null ? googleId + "@google.local" : "user@google.local");
+            String nm = (name != null) ? name : (email != null ? email : "User");
+            String gid = (googleId != null) ? googleId : em;
+            user = new User(em, nm, gid);
+            if (picture != null) user.setProfilePictureUrl(picture);
+            userRepository.save(user);
+        }
+        List<com.mealplanner.model.SavedMealPlan> recent = mealPlanRepository.findTop10ByUserOrderByCreatedAtDesc(user);
+        List<FoodLog> todaysFoodLogs = foodLogService.getTodaysFoodLogs(user);
+        Map<String, Integer> todaysTotals = foodLogService.calculateTodaysTotals(user);
+        com.mealplanner.model.SavedMealPlan latestPlan = recent.isEmpty() ? null : recent.get(0);
+
+        model.addAttribute("user", user);
+        model.addAttribute("savedPlans", recent);
+        model.addAttribute("todaysFoodLogs", todaysFoodLogs);
+        model.addAttribute("todaysTotals", todaysTotals);
+        model.addAttribute("latestPlan", latestPlan);
+        model.addAttribute("userPreferences", preferencesService.getUserPreferences(user));
+        return "dashboard";
+    }
+}

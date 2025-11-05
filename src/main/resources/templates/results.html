@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Retro Macros - Results</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}" />
+    <style>
+        .macro-progress .progress { height: 20px; }
+        .macro-progress .label { min-width: 120px; font-weight: 600; }
+    </style>
+</head>
+<body class="neon">
+<div th:replace="~{fragments/navbar :: authenticated-navbar}"></div>
+
+<div class="container mb-5">
+    <div class="card neon mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3 section-title">Your Daily Targets</h5>
+            <div class="row text-center">
+                <div class="col-6 col-md-3"><div><strong>Calories</strong></div><div th:text="${targets.calories}">2100</div></div>
+                <div class="col-6 col-md-3"><div><strong>Protein</strong></div><div th:text="${targets.protein + ' g'}">158 g</div></div>
+                <div class="col-6 col-md-3 mt-2 mt-md-0"><div><strong>Carbs</strong></div><div th:text="${targets.carbs + ' g'}">210 g</div></div>
+                <div class="col-6 col-md-3 mt-2 mt-md-0"><div><strong>Fat</strong></div><div th:text="${targets.fat + ' g'}">70 g</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div th:each="day : ${mealPlan.days}" class="mb-5">
+        <h4 class="section-title" th:text="${'Day ' + day.dayNumber}">Day 1</h4>
+
+        
+
+        <!-- Day macro split (30/40/30 reference) with numeric chips -->
+        <div class="mb-2"
+             th:with="pC=${day.dailyTotal.protein * 4.0}, cC=${day.dailyTotal.carbs * 4.0}, fC=${day.dailyTotal.fat * 9.0}, tot=${pC + cC + fC}, pPct=${(pC * 100.0) / (tot == 0 ? 1 : tot)}, cPct=${(cC * 100.0) / (tot == 0 ? 1 : tot)}, fPct=${(fC * 100.0) / (tot == 0 ? 1 : tot)}">
+            <div class="macro-chips mb-1">
+                <span class="badge macro-badge protein me-2" th:text="${'P ' + day.dailyTotal.protein + 'g (' + T(java.lang.Math).round(pPct) + '%)'}">P 160g (30%)</span>
+                <span class="badge macro-badge carb me-2" th:text="${'C ' + day.dailyTotal.carbs + 'g (' + T(java.lang.Math).round(cPct) + '%)'}">C 210g (40%)</span>
+                <span class="badge macro-badge fat" th:text="${'F ' + day.dailyTotal.fat + 'g (' + T(java.lang.Math).round(fPct) + '%)'}">F 70g (30%)</span>
+            </div>
+            <div class="macro-stack">
+                <div class="macro-seg protein" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, pPct)) + '%'}"></div>
+                <div class="macro-seg carb" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, cPct)) + '%'}"></div>
+                <div class="macro-seg fat" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, fPct)) + '%'}"></div>
+            </div>
+            <div class="small text-muted">Daily macro split (target 30/40/30)</div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-lg-2 g-3">
+            <div class="col" th:each="meal : ${day.meals}">
+                <div class="card neon h-100">
+                    <div class="card-body">
+                        <h5 class="card-title d-flex justify-content-between align-items-center">
+                            <span th:text="${meal.name}">Breakfast</span>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-neon" th:if="${meal.recipe != null}"
+                                        th:attr="data-recipe-name=${meal.recipe.name},
+                                                 data-ingredients=${#strings.arrayJoin(meal.recipe.ingredients.toArray(), '||')},
+                                                 data-instructions=${#strings.arrayJoin(meal.recipe.instructions.toArray(), '||')},
+                                                 data-prep=${meal.recipe.prepTime},
+                                                 data-cook=${meal.recipe.cookTime},
+                                                 data-total=${meal.recipe.totalTime}"
+                                        onclick="openRecipeModal(this)"><i class="bi bi-book"></i> View Recipe</button>
+                                <button type="button" class="btn btn-sm btn-outline-neon" onclick="showToast('Swap Meal coming soon')"><i class="bi bi-arrow-repeat"></i> Swap Meal</button>
+                            </div>
+                        </h5>
+                        <ul class="mb-3">
+                            <li th:each="fi : ${meal.foods}" th:text="${fi.item + ' — ' + fi.portion}">3 large eggs — 1 cup oatmeal</li>
+                        </ul>
+                        <div>
+                            <span class="badge text-bg-secondary me-2" th:text="${'Cal ' + meal.macros.calories}">Cal 520</span>
+                            <span class="badge text-bg-primary me-2" th:text="${'P ' + meal.macros.protein + 'g'}">P 32g</span>
+                            <span class="badge text-bg-info me-2" th:text="${'C ' + meal.macros.carbs + 'g'}">C 58g</span>
+                            <span class="badge text-bg-warning" th:text="${'F ' + meal.macros.fat + 'g'}">F 18g</span>
+                        </div>
+
+                        <div class="mt-3"
+                             th:with="pC=${meal.macros.protein * 4.0}, cC=${meal.macros.carbs * 4.0}, fC=${meal.macros.fat * 9.0}, tot=${pC + cC + fC}, pPct=${(pC * 100.0) / (tot == 0 ? 1 : tot)}, cPct=${(cC * 100.0) / (tot == 0 ? 1 : tot)}, fPct=${(fC * 100.0) / (tot == 0 ? 1 : tot)}, pDelta=${T(java.lang.Math).abs(pPct - 30.0)}, cDelta=${T(java.lang.Math).abs(cPct - 40.0)}, fDelta=${T(java.lang.Math).abs(fPct - 30.0)}">
+                            <div class="macro-stack"
+                                 th:classappend="${pDelta <= 5 and cDelta <= 5 and fDelta <= 5} ? ' ok' : (${pDelta <= 10 and cDelta <= 10 and fDelta <= 10} ? ' warn' : ' bad')">
+                                <div class="macro-seg protein" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, pPct)) + '%'}"></div>
+                                <div class="macro-seg carb" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, cPct)) + '%'}"></div>
+                                <div class="macro-seg fat" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, fPct)) + '%'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card neon">
+        <div class="card-body" id="grocery-list">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4 class="card-title mb-0 section-title">Grocery List</h4>
+                <div class="d-flex gap-2">
+                    <button id="copyListBtn" class="btn btn-sm btn-outline-neon" type="button">Copy List</button>
+                    <button id="exportCsvBtn" class="btn btn-sm btn-outline-neon" type="button">Export CSV</button>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 g-3" th:if="${groceryList != null and groceryList.categorizedItems != null and !#maps.isEmpty(groceryList.categorizedItems)}">
+                <div class="col" th:each="entry : ${groceryList.categorizedItems}">
+                    <h6 class="mb-2" th:text="${entry.key}">Proteins</h6>
+                    <ul class="mb-0">
+                        <li th:each="it : ${entry.value}" th:text="${it}">Chicken breast: 24 oz</li>
+                    </ul>
+                </div>
+            </div>
+            <div th:if="${groceryList == null or groceryList.categorizedItems == null or #maps.isEmpty(groceryList.categorizedItems)}" class="text-muted">
+                No grocery items were generated. Try again or enable mock mode to verify layout.
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:inline="none">
+    function buildGroceryText() {
+        const container = document.getElementById('grocery-list');
+        const cols = container.querySelectorAll('.col');
+        let lines = [];
+        cols.forEach(col => {
+            const header = col.querySelector('h6');
+            const items = Array.from(col.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean);
+            if (items.length) {
+                lines.push(header ? header.innerText.trim().toUpperCase() + ':' : '');
+                items.forEach(i => lines.push('- ' + i));
+                lines.push('');
+            }
+        });
+        return lines.join('\n');
+    }
+
+    function buildGroceryCsv() {
+        const container = document.getElementById('grocery-list');
+        const cols = container.querySelectorAll('.col');
+        const rows = [['Category', 'Item']];
+        cols.forEach(col => {
+            const header = col.querySelector('h6');
+            const cat = header ? header.innerText.trim() : '';
+            const items = Array.from(col.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean);
+            items.forEach(i => rows.push([cat, i]));
+        });
+        return rows.map(r => r.map(v => '"' + v.replaceAll('"', '""') + '"').join(',')).join('\n');
+    }
+
+    document.getElementById('copyListBtn')?.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(buildGroceryText());
+            const btn = document.getElementById('copyListBtn');
+            const original = btn.innerText;
+            btn.innerText = 'Copied!';
+            setTimeout(() => btn.innerText = original, 1200);
+        } catch (e) { console.error(e); }
+    });
+
+    document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
+        const csv = buildGroceryCsv();
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'grocery-list.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+</script>
+<script>
+    function openRecipeModal(btn){
+        const name = btn.getAttribute('data-recipe-name') || 'Recipe';
+        const ingredients = (btn.getAttribute('data-ingredients') || '').split('||').filter(Boolean);
+        const instructions = (btn.getAttribute('data-instructions') || '').split('||').filter(Boolean);
+        const prep = btn.getAttribute('data-prep') || '';
+        const cook = btn.getAttribute('data-cook') || '';
+        const total = btn.getAttribute('data-total') || '';
+
+        document.getElementById('recipeName').textContent = name;
+        const ingList = document.getElementById('recipeIngredients');
+        ingList.innerHTML = '';
+        ingredients.forEach(i => {
+            const li = document.createElement('li');
+            li.innerHTML = '<i class="bi bi-dot"></i> ' + i;
+            ingList.appendChild(li);
+        });
+        const instrList = document.getElementById('recipeInstructions');
+        instrList.innerHTML='';
+        instructions.forEach(s => {
+            const li = document.createElement('li');
+            li.textContent = s;
+            li.classList.add('mb-2');
+            instrList.appendChild(li);
+        });
+        document.getElementById('recipePrepTime').textContent = prep;
+        document.getElementById('recipeCookTime').textContent = cook;
+        document.getElementById('recipeTotalTime').textContent = total;
+
+        const modal = new bootstrap.Modal(document.getElementById('recipeModal'));
+        modal.show();
+    }
+</script>
+
+<!-- Recipe Modal -->
+<div class="modal fade" id="recipeModal" tabindex="-1" aria-labelledby="recipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content neon">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recipeModalLabel"><i class="bi bi-book"></i> <span id="recipeName">Recipe</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <h6 class="text-uppercase mb-3"><i class="bi bi-cart"></i> Ingredients</h6>
+                    <ul id="recipeIngredients" class="list-unstyled ps-3"></ul>
+                </div>
+                <div class="mb-4">
+                    <h6 class="text-uppercase mb-3"><i class="bi bi-list-ol"></i> Instructions</h6>
+                    <ol id="recipeInstructions" class="ps-3"></ol>
+                </div>
+                <div class="d-flex justify-content-around text-center">
+                    <div>
+                        <div class="badge bg-primary p-2 mb-1"><i class="bi bi-clock"></i></div>
+                        <div><small>Prep</small></div>
+                        <div><strong id="recipePrepTime">-</strong></div>
+                    </div>
+                    <div>
+                        <div class="badge bg-warning p-2 mb-1"><i class="bi bi-fire"></i></div>
+                        <div><small>Cook</small></div>
+                        <div><strong id="recipeCookTime">-</strong></div>
+                    </div>
+                    <div>
+                        <div class="badge bg-success p-2 mb-1"><i class="bi bi-check-circle"></i></div>
+                        <div><small>Total</small></div>
+                        <div><strong id="recipeTotalTime">-</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    </div>
+<script>
+    function openSwapIngredient(btn) {
+        const original = btn.getAttribute('data-original');
+        const mealName = btn.getAttribute('data-meal');
+        document.getElementById('originalIngredient').textContent = original + ' (' + mealName + ')';
+        document.getElementById('originalMacros').textContent = '';
+        // For now we don't have per-item macros; request with rough meal-level defaults
+        fetch('/swap/ingredient-options', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `originalFood=${encodeURIComponent(original)}&calories=0&protein=0&carbs=0&fat=0`
+        }).then(r => r.json()).then(data => {
+            const list = document.getElementById('swapOptionsList');
+            list.innerHTML = '';
+            if (data.success && Array.isArray(data.suggestions)) {
+                data.suggestions.forEach(opt => {
+                    const item = document.createElement('button');
+                    item.className = 'list-group-item list-group-item-action';
+                    item.innerHTML = `<div class="d-flex justify-content-between"><strong>${opt.name}</strong><span class="badge text-bg-secondary">${opt.calories} cal</span></div><small class="text-muted">${opt.protein}g P | ${opt.carbs}g C | ${opt.fat}g F</small>`;
+                    item.onclick = () => confirmSwap(mealName, original, opt.name);
+                    list.appendChild(item);
+                });
+            } else {
+                list.innerHTML = '<div class="text-muted">No suggestions available.</div>';
+            }
+        });
+        const modal = new bootstrap.Modal(document.getElementById('swapIngredientModal'));
+        modal.show();
+    }
+
+    function confirmSwap(mealId, originalFood, replacement) {
+        // Backend record only; UI mutation of parsed results is non-trivial here
+        fetch('/swap/record', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `swapType=ingredient&originalFood=${encodeURIComponent(originalFood)}&replacementFood=${encodeURIComponent(replacement)}&mealContext=${encodeURIComponent(mealId)}`
+        });
+        bootstrap.Modal.getInstance(document.getElementById('swapIngredientModal')).hide();
+        showToast('Ingredient swapped! We\'ll remember your preference.');
+    }
+
+    function showToast(msg) {
+        // Simple inline toast fallback
+        const div = document.createElement('div');
+        div.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+        div.textContent = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 2000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Augment each food list item with a [Swap] button if missing
+        document.querySelectorAll('.card.neon .card-body ul.mb-3 li').forEach(li => {
+            if (li.querySelector('button.swap-btn')) return; // already added
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-link swap-btn ms-2';
+            btn.textContent = '[Swap]';
+            const mealName = li.closest('.card-body')?.querySelector('.card-title')?.innerText?.trim() || 'Meal';
+            btn.setAttribute('data-original', li.innerText.trim());
+            btn.setAttribute('data-meal', mealName);
+            btn.onclick = () => openSwapIngredient(btn);
+            li.appendChild(btn);
+        });
+    });
+</script>
+
+<!-- Swap Ingredient Modal -->
+<div class="modal fade" id="swapIngredientModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content neon">
+    <div class="modal-header"><h5 class="modal-title" id="swapModalTitle">Swap Ingredient</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="alert alert-info mb-3">
+            <strong>Original:</strong> <span id="originalIngredient"></span><br>
+            <span id="originalMacros" class="small text-muted"></span>
+        </div>
+        <h6 class="mb-3">Choose a replacement:</h6>
+        <div id="swapOptionsList" class="list-group mb-3"></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+</div></div></div>
+</body>
+</html>

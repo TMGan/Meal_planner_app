@@ -1,0 +1,317 @@
+/* Cyberpunk Neon Theme */
+:root {
+  --bg: #0a0f1f;
+  --bg-alt: #0d1326;
+  --card: rgba(20, 26, 48, 0.85);
+  --text: #e6f1ff;
+  --muted: #8aa0b8;
+  --neon-blue: #2dd4ff;
+  --neon-purple: #a78bfa;
+  --neon-orange: #ff8c37;
+  --success: #20e3b2;
+  --warning: #ffd166;
+  --danger: #ff5d6c;
+  --glow: 0 0 8px rgba(45, 212, 255, 0.6), 0 0 20px rgba(167, 139, 250, 0.35);
+}
+
+html, body {
+  height: 100%;
+}
+
+body.neon {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(167, 139, 250, 0.15), transparent 60%),
+              radial-gradient(1000px 500px at 110% 10%, rgba(45, 212, 255, 0.10), transparent 60%),
+              linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+  color: var(--text);
+}
+
+.navbar.neon {
+  background: linear-gradient(90deg, rgba(10,15,31,0.8) 0%, rgba(13,19,38,0.8) 100%);
+  border-bottom: 1px solid rgba(45, 212, 255, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+.neon-brand {
+  font-family: 'Orbitron', 'Audiowide', system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  color: var(--neon-blue);
+  text-shadow: 0 0 6px rgba(45, 212, 255, 0.7), 0 0 18px rgba(167, 139, 250, 0.45);
+}
+
+.card.neon {
+  background: var(--card);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 24px rgba(45, 212, 255, 0.08);
+}
+
+/* Ensure strong contrast for content inside neon cards */
+.neon .card.neon .card-body,
+.neon .card.neon .card-body p,
+.neon .card.neon .card-body li,
+.neon .card.neon .card-body span,
+.neon .card.neon .card-title {
+  color: var(--text) !important;
+}
+.neon ul li { color: var(--text) !important; }
+.neon .text-dark { color: var(--text) !important; }
+
+.text-muted { color: var(--muted) !important; }
+
+.form-label, label, h1, h2, h3, h4, h5, h6 { color: var(--text); }
+
+.form-control, .form-select, .form-check-input {
+  background-color: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+}
+.form-control:focus, .form-select:focus {
+  background-color: rgba(255,255,255,0.06);
+  border-color: rgba(45, 212, 255, 0.55);
+  box-shadow: 0 0 0 0.2rem rgba(45, 212, 255, 0.18);
+  color: var(--text);
+}
+
+.btn-neon {
+  border: 1px solid rgba(45, 212, 255, 0.6);
+  color: var(--text);
+  background: linear-gradient(90deg, rgba(45, 212, 255, 0.15), rgba(167, 139, 250, 0.15));
+  text-shadow: 0 0 6px rgba(45, 212, 255, 0.6);
+}
+.btn-neon:hover {
+  border-color: var(--neon-blue);
+  box-shadow: var(--glow);
+}
+.btn-outline-neon {
+  border: 1px solid rgba(167, 139, 250, 0.55);
+  color: var(--text);
+}
+.btn-outline-neon:hover { box-shadow: var(--glow); border-color: var(--neon-blue); }
+
+.badge { filter: drop-shadow(0 0 8px rgba(45,212,255,0.15)); }
+.badge.text-bg-secondary { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); }
+.badge.text-bg-primary { background: rgba(45, 212, 255, 0.2); border: 1px solid rgba(45, 212, 255, 0.5); }
+.badge.text-bg-info { background: rgba(167, 139, 250, 0.25); border: 1px solid rgba(167, 139, 250, 0.55); }
+.badge.text-bg-warning { background: rgba(255, 140, 55, 0.22); border: 1px solid rgba(255, 140, 55, 0.5); }
+
+.macro-progress .value { min-width: 180px; text-align: right; }
+.progress { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.15); height: 20px; }
+.progress-bar {
+  background-image: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+  box-shadow: 0 0 10px rgba(45, 212, 255, 0.35), 0 0 20px rgba(167, 139, 250, 0.25) inset;
+}
+.progress-bar.bg-success { background-image: linear-gradient(90deg, var(--success), var(--neon-blue)); }
+.progress-bar.bg-warning { background-image: linear-gradient(90deg, var(--warning), var(--neon-orange)); }
+.progress-bar.bg-danger { background-image: linear-gradient(90deg, var(--danger), var(--neon-orange)); }
+
+/* Per-meal stacked macro bar */
+.macro-stack {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.18);
+  background:
+    linear-gradient(to right,
+      transparent 0,
+      transparent 30%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.25) calc(30% + 1px), transparent calc(30% + 1px),
+      transparent 70%, rgba(255,255,255,0.25) 70%, rgba(255,255,255,0.25) calc(70% + 1px), transparent calc(70% + 1px)
+    );
+}
+.macro-stack.ok { border-color: rgba(32, 227, 178, 0.7); box-shadow: 0 0 8px rgba(32,227,178,0.25); }
+.macro-stack.warn { border-color: rgba(255, 209, 102, 0.7); box-shadow: 0 0 8px rgba(255,209,102,0.20); }
+.macro-stack.bad { border-color: rgba(255, 93, 108, 0.7); box-shadow: 0 0 8px rgba(255,93,108,0.20); }
+
+.macro-seg { height: 100%; float: left; }
+.macro-seg.protein { background: rgba(45, 212, 255, 0.7); }
+.macro-seg.carb { background: rgba(167, 139, 250, 0.7); }
+.macro-seg.fat { background: rgba(255, 140, 55, 0.7); }
+
+/* Day-level meal composition bar */
+.day-stack {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.day-seg { height: 100%; }
+.day-seg.breakfast { background: rgba(45, 212, 255, 0.6); }
+.day-seg.lunch { background: rgba(167, 139, 250, 0.6); }
+.day-seg.dinner { background: rgba(32, 227, 178, 0.6); }
+.day-seg.snack { background: rgba(255, 140, 55, 0.6); }
+
+/* Neon modals */
+.neon .modal-content {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 24px rgba(45, 212, 255, 0.08);
+}
+.neon .modal-header, .neon .modal-footer { border-color: rgba(255,255,255,0.12); }
+.neon .modal-title { color: var(--text); }
+.neon .table { color: var(--text); }
+.neon .table thead th { color: var(--text); }
+
+/* Chips for macro numbers */
+.macro-chips .macro-badge { border: 1px solid rgba(255,255,255,0.2); color: var(--text); }
+.macro-badge.protein { background: rgba(45, 212, 255, 0.15); border-color: rgba(45, 212, 255, 0.45); }
+.macro-badge.carb { background: rgba(167, 139, 250, 0.18); border-color: rgba(167, 139, 250, 0.5); }
+.macro-badge.fat { background: rgba(255, 140, 55, 0.18); border-color: rgba(255, 140, 55, 0.5); }
+
+.section-title { font-family: 'Orbitron', 'Audiowide', system-ui, sans-serif; letter-spacing: 0.04em; }
+
+/* Links and misc */
+a { color: var(--neon-blue); }
+a:hover { color: var(--neon-purple); text-shadow: 0 0 6px rgba(45,212,255,0.6); }
+
+/* Neon hero section for home page */
+.hero-neon {
+  background:
+    radial-gradient(900px 400px at 15% 0%, rgba(167,139,250,0.15), transparent 60%),
+    radial-gradient(900px 400px at 85% 0%, rgba(45,212,255,0.12), transparent 60%);
+  border-top: 1px solid rgba(45, 212, 255, 0.12);
+  border-bottom: 1px solid rgba(45, 212, 255, 0.12);
+}
+
+/* Alerts: info/success/warning/danger tuned for neon theme */
+.neon .alert { 
+  background: rgba(255,255,255,0.06); 
+  color: var(--text); 
+  border: 1px solid rgba(255,255,255,0.18); 
+}
+.neon .alert-info { border-color: rgba(45,212,255,0.35); background: rgba(45,212,255,0.10); }
+.neon .alert-success { border-color: rgba(32,227,178,0.35); background: rgba(32,227,178,0.10); }
+.neon .alert-warning { border-color: rgba(255,209,102,0.40); background: rgba(255,209,102,0.12); color: #1a1f2e; }
+.neon .alert-danger { border-color: rgba(255,93,108,0.40); background: rgba(255,93,108,0.12); }
+
+/* Form selects: match cyberpunk inputs (dark surface + neon glow) */
+.form-select {
+  background-color: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+}
+.form-select:focus {
+  background-color: rgba(255,255,255,0.06);
+  border-color: rgba(45, 212, 255, 0.55);
+  box-shadow: 0 0 0 0.2rem rgba(45, 212, 255, 0.18);
+  color: var(--text);
+}
+/* Ensure selects are clearly readable on neon pages */
+.neon .form-select,
+.neon select.form-select {
+  background-color: rgba(20,26,48,0.85) !important; /* var(--card) */
+  color: var(--text) !important;
+  border: 1px solid rgba(167, 139, 250, 0.25) !important;
+}
+.neon .form-select:focus,
+.neon select.form-select:focus {
+  background-color: rgba(20,26,48,0.92) !important;
+  border-color: rgba(45, 212, 255, 0.55) !important;
+  box-shadow: 0 0 0 0.2rem rgba(45, 212, 255, 0.18) !important;
+}
+.neon .form-select option {
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+/* Range sliders (macro split) */
+.form-range { height: 1.25rem; padding: 0; }
+.form-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 4px; cursor: pointer;
+  background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.form-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; margin-top: -7px;
+  height: 20px; width: 20px; border-radius: 50%;
+  background: var(--neon-blue);
+  border: 2px solid rgba(167,139,250,0.6);
+  box-shadow: 0 0 10px rgba(45,212,255,0.6), 0 0 18px rgba(167,139,250,0.35);
+}
+.form-range:active::-webkit-slider-thumb {
+  box-shadow: 0 0 14px rgba(45,212,255,0.8), 0 0 24px rgba(167,139,250,0.45);
+}
+.form-range::-moz-range-track {
+  height: 6px; border-radius: 4px; cursor: pointer;
+  background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.form-range::-moz-range-thumb {
+  height: 20px; width: 20px; border-radius: 50%; cursor: pointer;
+  background: var(--neon-blue);
+  border: 2px solid rgba(167,139,250,0.6);
+  box-shadow: 0 0 10px rgba(45,212,255,0.6), 0 0 18px rgba(167,139,250,0.35);
+}
+
+/* Make badges consistent and glowy */
+.badge { border-radius: 10px; font-weight: 600; }
+.badge.bg-primary { background: rgba(45,212,255,0.22); border: 1px solid rgba(45,212,255,0.55); color: var(--text); }
+.badge.bg-warning { background: rgba(255,209,102,0.22); border: 1px solid rgba(255,209,102,0.55); }
+.badge.bg-danger { background: rgba(255,93,108,0.22); border: 1px solid rgba(255,93,108,0.55); }
+
+/* Reset button variant alignment */
+.btn-outline-light { 
+  border: 1px solid rgba(167,139,250,0.55); 
+  color: var(--text);
+}
+.btn-outline-light:hover { box-shadow: var(--glow); border-color: var(--neon-blue); }
+
+/* Readability: dropdown menus and selects */
+.neon .dropdown-menu {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid rgba(45, 212, 255, 0.18);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 18px rgba(45,212,255,0.10);
+  backdrop-filter: blur(6px);
+}
+.neon .dropdown-item { color: var(--text); }
+.neon .dropdown-item:hover, .neon .dropdown-item:focus {
+  background: rgba(45,212,255,0.12);
+  color: var(--text);
+}
+.neon .dropdown-divider { border-color: rgba(255,255,255,0.12); }
+
+/* Improve option readability specifically in Preferences modal */
+#preferencesModal .form-select {
+  background-color: rgba(255,255,255,0.96);
+  color: #0a0f1f;
+}
+#preferencesModal .form-select:focus {
+  border-color: rgba(10,15,31,0.35);
+  box-shadow: 0 0 0 0.2rem rgba(45, 212, 255, 0.18);
+}
+#preferencesModal .form-select option { color: #0a0f1f; }
+/* Neon button overrides for consistency */
+.neon .btn-primary, .neon .btn-success, .neon .btn-warning, .neon .btn-danger {
+  color: var(--text);
+  border: 1px solid rgba(167,139,250,0.45);
+  background: linear-gradient(90deg, rgba(45,212,255,0.15), rgba(167,139,250,0.15));
+  text-shadow: 0 0 6px rgba(45,212,255,0.5);
+}
+.neon .btn-primary:hover, .neon .btn-success:hover, .neon .btn-warning:hover, .neon .btn-danger:hover {
+  box-shadow: var(--glow);
+  border-color: var(--neon-blue);
+}
+.neon .btn-outline-primary, .neon .btn-outline-success, .neon .btn-outline-warning, .neon .btn-outline-danger {
+  color: var(--text);
+  border: 1px solid rgba(167,139,250,0.55);
+}
+.neon .btn-outline-primary:hover, .neon .btn-outline-success:hover,
+.neon .btn-outline-warning:hover, .neon .btn-outline-danger:hover {
+  box-shadow: var(--glow);
+  border-color: var(--neon-blue);
+}
+
+/* Table polish to match theme */
+.neon .table {
+  color: var(--text);
+  border-color: rgba(255,255,255,0.12);
+}
+.neon .table thead th { border-bottom-color: rgba(255,255,255,0.18); }
+.neon .table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(255,255,255,0.04);
+}
+.neon .table-dark { background-color: rgba(20,26,48,0.6); }
+
+/* Feature icon utility */
+.feature-icon { color: var(--neon-purple) !important; }
