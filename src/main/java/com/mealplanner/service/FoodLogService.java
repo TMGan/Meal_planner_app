@@ -115,7 +115,7 @@ public class FoodLogService {
             throw new IllegalStateException("AI API configuration missing");
         }
 
-        String prompt = buildMacroEstimationPrompt(foodDescription);
+        String prompt = buildMacroEstimationPromptV2(foodDescription);
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", model);
@@ -192,6 +192,25 @@ public class FoodLogService {
             "\"%s\"\n\n" +
             "Your response (either \"INVALID\" or \"calories,protein,carbs,fat\"):",
             foodDescription
+        );
+    }
+
+    // Updated prompt focused on USDA accuracy and precise numeric-only output
+    private String buildMacroEstimationPromptV2(String foodDescription) {
+        return String.format(
+                "You are a professional fitness nutritionist with access to USDA FoodData Central.\n" +
+                "Task: Analyze a food description and estimate macros ACCURATELY.\n\n" +
+                "RULES:\n" +
+                "- Use USDA standards for whole foods; account for cooked vs raw weights.\n" +
+                "- Be precise: round to nearest 1g.\n" +
+                "- Use realistic portions; if portion unspecified, assume typical serving (e.g., chicken cooked 6oz, rice 1 cup cooked).\n" +
+                "- If uncertain, choose conservative estimates (avoid inflated numbers).\n" +
+                "- Reject only non-food, offensive, or gibberish inputs.\n\n" +
+                "OUTPUT: If invalid, respond EXACTLY: INVALID.\n" +
+                "If valid, respond with ONLY: calories,protein,carbs,fat (numbers only, comma-separated).\n\n" +
+                "Food: \"%s\"\n\n" +
+                "Response:",
+                foodDescription
         );
     }
 

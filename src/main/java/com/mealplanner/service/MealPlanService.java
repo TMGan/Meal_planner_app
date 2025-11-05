@@ -47,7 +47,7 @@ public class MealPlanService {
                            @Value("${ai.timeout.ms:30000}") long timeoutMs,
                            @Value("${ai.mock:false}") boolean mockMode,
                            @Value("${ai.repair.enabled:true}") boolean repairEnabled,
-                           @Value("${ai.max_tokens:3500}") int maxTokens,
+                           @Value("${ai.max_tokens:6000}") int maxTokens,
                            @Value("${ai.temperature:0.2}") double temperature) {
         this.provider = provider;
         this.anthropicUrl = anthropicUrl;
@@ -71,7 +71,7 @@ public class MealPlanService {
         if (mockMode) {
             return generateMockMealPlan(profile, targets);
         }
-        String prompt = buildPrompt(profile, targets);
+        String prompt = buildPromptV2(profile, targets);
         String raw = callAI(prompt);
         try {
             String json = sanitizeToJson(raw);
@@ -92,7 +92,7 @@ public class MealPlanService {
         if (mockMode) {
             return generateMockMealPlan(profile, targets);
         }
-        String base = buildPrompt(profile, targets);
+        String base = buildPromptV2(profile, targets);
         String prompt = (extraPrompt != null && !extraPrompt.isBlank()) ? (base + "\n\n" + extraPrompt) : base;
         String raw = callAI(prompt);
         try {
@@ -313,6 +313,134 @@ public class MealPlanService {
                     d.setDailyTotal(new MacroTargets(cal, p, c, f));
                 }
             }
+        }
+    }
+
+    // New nutritionist-mode prompt with whole-food focus, tight macro accuracy, and variety constraints.
+    private String buildPromptV2(UserProfile profile, MacroTargets targets) {
+        String allergies = (profile.getAllergies() == null || profile.getAllergies().isEmpty())
+                ? "None" : String.join(", ", profile.getAllergies());
+
+        String persona = "You are a professional fitness nutritionist and chef with macro-tracking expertise.\n" +
+                "CRITICAL RULES FOR MACRO CALCULATIONS:\n" +
+                "1) Use USDA FoodData Central standards for whole foods.\n" +
+                "2) Be precise: round macros to the nearest 1g.\n" +
+                "3) Account for cooking method (raw vs cooked weights).\n" +
+                "4) Realistic portions: chicken breast 6-8oz cooked; fish 5-7oz; eggs 1 large = 70 cal/6g P/5g F; rice 1 cup cooked ~200 cal/45g C; sweet potato medium (5oz) ~110 cal/26g C.\n" +
+                "5) If numbers seem off, recalc before responding; prioritize accuracy.\n\n" +
+                "MEAL PHILOSOPHY:\n" +
+                "- Prioritize whole, minimally processed foods.\n" +
+                "- Keep meals exciting and flavorful; vary cooking techniques and ingredients.\n" +
+                "- Respect allergies and user preferences.\n\n" +
+                "VARIETY REQUIREMENTS (3 days):\n" +
+                "- No meal may repeat across all days.\n" +
+                "- Each day features a different primary protein:\n  * Day 1: Chicken or Turkey\n  * Day 2: Fish or Seafood\n  * Day 3: Beef or Pork or Eggs\n" +
+                "- Rotate breakfasts (e.g., eggs → oats → yogurt parfait).\n" +
+                "- Rotate vegetables and grains; vary cooking methods.\n\n" +
+                "OUTPUT: Return ONLY a valid JSON object (no prose, no code fences).";
+
+        String user = "USER PROFILE:\n" +
+                "- Daily Calorie Target: " + targets.getCalories() + "\n" +
+                "- Daily Protein Target: " + targets.getProtein() + "g\n" +
+                "- Daily Carb Target: " + targets.getCarbs() + "g\n" +
+                "- Daily Fat Target: " + targets.getFat() + "g\n" +
+                "- Fitness Goal: " + profile.getFitnessGoal() + "\n" +
+                "- Allergies/Restrictions: " + allergies + "\n\n";
+
+        String schema = "SCHEMA (exact keys):\n" +
+                "{\\n  \"days\": [\\n    {\\n      \"day\": number,\\n      \"meals\": [\\n        {\\n          \"name\\\": string,\\n          \"foods\\\": [ { \\\"item\\\": string, \\\"portion\\\": string } ],\\n          \"macros\\\": { \\\"calories\\\": number, \\\"protein\\\": number, \\\"carbs\\\": number, \\\"fat\\\": number },\\n          \"recipe\\\": { \\\"name\\\": string, \\\"ingredients\\\": [string], \\\"instructions\\\": [string], \\\"prepTime\\\": string, \\\"cookTime\\\": string, \\\"totalTime\\\": string }\\n        }\\n      ],\\n      \"dailyTotals\\\": { \\\"calories\\\": number, \\\"protein\\\": number, \\\"carbs\\\": number, \\\"fat\\\": number }\\n    }\\n  ]\\n}";
+
+        String guide = "GENERATION INSTRUCTIONS:\n" +
+                "- Generate a complete 3-day plan. Each day: 3-4 meals + 1 snack.\n" +
+                "- Hit daily targets within ±50 calories; keep macro totals coherent.\n" +
+                "- Each meal must include a practical recipe with ingredients (quantities) and 3-5 clear steps.\n" +
+                "- Use whole ingredients; keep recipes flavorful and efficient; include prep/cook/total time.\n" +
+                "- Output strictly as JSON per schema.\n";
+
+        return persona + "\n\n" + user + schema + "\n\n" + guide;
+    }
+
+    // --- Single-meal generation for Swap ---
+    public Meal generateReplacementMeal(MacroTargets target, String avoidSimilarTo) {
+        String avoid = (avoidSimilarTo == null || avoidSimilarTo.isBlank()) ? "" : ("Avoid making anything similar to: " + avoidSimilarTo + "\n");
+        String prompt = String.format("""
+                You are a professional fitness nutritionist and chef. Generate ONE different meal that fits these macros closely.
+
+                TARGET MACROS (± small tolerance):
+                - Calories: %d (±40)
+                - Protein: %dg (±5)
+                - Carbs: %dg (±8)
+                - Fat: %dg (±5)
+
+                RULES:
+                - Prioritize whole, minimally processed foods and exciting but practical flavors.
+                - Use realistic portions and account for cooked weights.
+                - Include a simple, practical recipe with quantities and 3-5 clear steps.
+                - %sReturn ONLY a valid JSON object matching this schema (no prose, no code fences):
+                {
+                  "name": string, // meal type or short label
+                  "foods": [ {"item": string, "portion": string} ],
+                  "macros": { "calories": number, "protein": number, "carbs": number, "fat": number },
+                  "recipe": { "name": string, "ingredients": [string], "instructions": [string], "prepTime": string, "cookTime": string, "totalTime": string }
+                }
+                """,
+                target.getCalories(), target.getProtein(), target.getCarbs(), target.getFat(), avoid);
+
+        String raw = callAI(prompt);
+        String json = sanitizeToJson(raw);
+        return parseSingleMeal(json);
+    }
+
+    private Meal parseSingleMeal(String json) {
+        try {
+            com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(json);
+            Meal m = new Meal();
+            m.setName(asText(root.get("name"), List.of("name"), "Meal"));
+            // macros
+            com.fasterxml.jackson.databind.JsonNode macros = root.get("macros");
+            MacroTargets mt = new MacroTargets(
+                    asInt(macros, List.of("calories", "kcal"), 0),
+                    asInt(macros, List.of("protein", "protein_g"), 0),
+                    asInt(macros, List.of("carbs", "carbohydrates", "carbs_g"), 0),
+                    asInt(macros, List.of("fat", "fat_g"), 0)
+            );
+            m.setMacros(mt);
+            // foods
+            List<FoodItem> foods = new ArrayList<>();
+            com.fasterxml.jackson.databind.JsonNode foodsNode = root.get("foods");
+            if (foodsNode != null && foodsNode.isArray()) {
+                for (com.fasterxml.jackson.databind.JsonNode f : foodsNode) {
+                    String item = asText(f.get("item"), List.of("item", "name"), "");
+                    String portion = asText(f.get("portion"), List.of("portion", "amount"), "");
+                    if (!item.isBlank()) foods.add(new FoodItem(item, portion));
+                }
+            }
+            m.setFoods(foods);
+            // recipe
+            com.fasterxml.jackson.databind.JsonNode r = root.get("recipe");
+            if (r != null && !r.isNull()) {
+                com.mealplanner.model.Recipe rec = new com.mealplanner.model.Recipe();
+                rec.setName(asText(r.get("name"), List.of("name", "title"), m.getName()));
+                List<String> ings = new ArrayList<>();
+                com.fasterxml.jackson.databind.JsonNode ri = r.get("ingredients");
+                if (ri != null && ri.isArray()) {
+                    for (com.fasterxml.jackson.databind.JsonNode x : ri) ings.add(x.asText());
+                }
+                rec.setIngredients(ings);
+                List<String> instr = new ArrayList<>();
+                com.fasterxml.jackson.databind.JsonNode rs = r.get("instructions");
+                if (rs != null && rs.isArray()) {
+                    for (com.fasterxml.jackson.databind.JsonNode x : rs) instr.add(x.asText());
+                }
+                rec.setInstructions(instr);
+                rec.setPrepTime(asText(r.get("prepTime"), List.of("prepTime"), ""));
+                rec.setCookTime(asText(r.get("cookTime"), List.of("cookTime"), ""));
+                rec.setTotalTime(asText(r.get("totalTime"), List.of("totalTime"), ""));
+                m.setRecipe(rec);
+            }
+            return m;
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid single-meal JSON", e);
         }
     }
 

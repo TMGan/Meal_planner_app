@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/theme.css}" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <style>
         .macro-progress .progress { height: 20px; }
         .macro-progress .label { min-width: 120px; font-weight: 600; }
@@ -58,14 +60,28 @@
                             <span th:text="${meal.name}">Breakfast</span>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-neon" th:if="${meal.recipe != null}"
-                                        th:attr="data-recipe-name=${meal.recipe.name},
-                                                 data-ingredients=${#strings.arrayJoin(meal.recipe.ingredients.toArray(), '||')},
-                                                 data-instructions=${#strings.arrayJoin(meal.recipe.instructions.toArray(), '||')},
-                                                 data-prep=${meal.recipe.prepTime},
-                                                 data-cook=${meal.recipe.cookTime},
-                                                 data-total=${meal.recipe.totalTime}"
-                                        onclick="openRecipeModal(this)"><i class="bi bi-book"></i> View Recipe</button>
-                                <button type="button" class="btn btn-sm btn-outline-neon" onclick="showToast('Swap Meal coming soon')"><i class="bi bi-arrow-repeat"></i> Swap Meal</button>
+                                         th:attr="data-recipe-name=${meal.recipe.name},
+                                                  data-ingredients=${#strings.arrayJoin(meal.recipe.ingredients.toArray(), '||')},
+                                                  data-instructions=${#strings.arrayJoin(meal.recipe.instructions.toArray(), '||')},
+                                                  data-prep=${meal.recipe.prepTime},
+                                                  data-cook=${meal.recipe.cookTime},
+                                                  data-total=${meal.recipe.totalTime}"
+                                         onclick="openRecipeModal(this)"><i class="bi bi-book"></i> View Recipe</button>
+                                <button type="button" class="btn btn-sm btn-outline-neon"
+                                        th:attr="data-cal=${meal.macros.calories},
+                                                 data-pro=${meal.macros.protein},
+                                                 data-carbs=${meal.macros.carbs},
+                                                 data-fat=${meal.macros.fat},
+                                                 data-mealtype=${meal.name},
+                                                 data-recipename=${meal.recipe != null ? meal.recipe.name : ''}"
+                                        onclick="swapMeal(this)"><i class="bi bi-arrow-repeat"></i> Swap Meal</button>
+                                <button type="button" class="btn btn-sm btn-neon"
+                                        th:attr="data-cal=${meal.macros.calories},
+                                                 data-pro=${meal.macros.protein},
+                                                 data-carbs=${meal.macros.carbs},
+                                                 data-fat=${meal.macros.fat},
+                                                 data-recipename=${meal.recipe != null ? meal.recipe.name : ''}"
+                                        onclick="quickAddFromCard(this)"><i class="bi bi-lightning-charge"></i> Quick Add</button>
                             </div>
                         </h5>
                         <ul class="mb-3">
@@ -203,6 +219,102 @@
 
         const modal = new bootstrap.Modal(document.getElementById('recipeModal'));
         modal.show();
+    }
+    
+    function getCsrf() {
+        const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+        const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+        return { header, token };
+    }
+
+    function quickAddFromCard(btn) {
+        const card = btn.closest('.card-body');
+        const descParts = Array.from(card.querySelectorAll('ul li'))
+            .map(li => li.innerText.replace('[Swap]', '').trim()).filter(Boolean);
+        const recipeName = btn.getAttribute('data-recipename') || '';
+        const description = (recipeName ? (recipeName + ' - ') : '') + descParts.join(', ');
+        const cal = parseInt(btn.getAttribute('data-cal') || '0', 10);
+        const pro = parseInt(btn.getAttribute('data-pro') || '0', 10);
+        const carbs = parseInt(btn.getAttribute('data-carbs') || '0', 10);
+        const fat = parseInt(btn.getAttribute('data-fat') || '0', 10);
+        const mealType = card.querySelector('.card-title span')?.innerText?.trim() || 'Meal';
+        const csrf = getCsrf();
+        const body = new URLSearchParams();
+        body.set('mealName', mealType);
+        body.set('foodDescription', description);
+        body.set('calories', String(cal));
+        body.set('protein', String(pro));
+        body.set('carbs', String(carbs));
+        body.set('fat', String(fat));
+        fetch('/food-log/quick-add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', [csrf.header]: csrf.token },
+            body: body.toString()
+        }).then(r => {
+            if (r.ok) {
+                showToast('Meal added to today\'s log!');
+            } else {
+                showToast('Failed to add meal');
+            }
+        }).catch(() => showToast('Failed to add meal'));
+    }
+
+    function swapMeal(btn) {
+        const card = btn.closest('.card-body');
+        const cal = parseInt(btn.getAttribute('data-cal') || card.querySelector('.meal-macros')?.getAttribute('data-cal') || '0', 10);
+        const pro = parseInt(btn.getAttribute('data-pro') || card.querySelector('.meal-macros')?.getAttribute('data-pro') || '0', 10);
+        const carbs = parseInt(btn.getAttribute('data-carbs') || card.querySelector('.meal-macros')?.getAttribute('data-carbs') || '0', 10);
+        const fat = parseInt(btn.getAttribute('data-fat') || card.querySelector('.meal-macros')?.getAttribute('data-fat') || '0', 10);
+        const avoid = btn.getAttribute('data-recipename') || '';
+        const csrf = getCsrf();
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Swapping';
+        fetch('/api/meal/swap', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', [csrf.header]: csrf.token },
+            body: JSON.stringify({ targetCalories: cal, targetProtein: pro, targetCarbs: carbs, targetFat: fat, avoidSimilarTo: avoid })
+        }).then(r => r.ok ? r.json() : Promise.reject()).then(data => {
+            // Update foods list
+            const list = card.querySelector('ul');
+            if (list && Array.isArray(data.foods)) {
+                list.innerHTML = '';
+                data.foods.forEach(f => {
+                    const li = document.createElement('li');
+                    li.textContent = (f.portion ? (f.portion + ' ') : '') + (f.item || '');
+                    list.appendChild(li);
+                });
+            }
+            // Update macros badges
+            const macroContainer = card.querySelector('ul + div');
+            if (data.macros) {
+                if (macroContainer) {
+                    const spans = macroContainer.querySelectorAll('span.badge');
+                    if (spans[0]) spans[0].textContent = 'Cal ' + data.macros.calories;
+                    if (spans[1]) spans[1].textContent = 'P ' + data.macros.protein + 'g';
+                    if (spans[2]) spans[2].textContent = 'C ' + data.macros.carbs + 'g';
+                    if (spans[3]) spans[3].textContent = 'F ' + data.macros.fat + 'g';
+                }
+                // also update button data for quick add
+                btn.setAttribute('data-cal', data.macros.calories);
+                btn.setAttribute('data-pro', data.macros.protein);
+                btn.setAttribute('data-carbs', data.macros.carbs);
+                btn.setAttribute('data-fat', data.macros.fat);
+            }
+            // Update recipe button attributes if present
+            const rb = card.querySelector('button[onclick^="openRecipeModal"]');
+            if (rb && data.recipe) {
+                rb.setAttribute('data-recipe-name', data.recipe.name || 'Recipe');
+                rb.setAttribute('data-ingredients', Array.isArray(data.recipe.ingredients) ? data.recipe.ingredients.join('||') : '');
+                rb.setAttribute('data-instructions', Array.isArray(data.recipe.instructions) ? data.recipe.instructions.join('||') : '');
+                rb.setAttribute('data-prep', data.recipe.prepTime || '');
+                rb.setAttribute('data-cook', data.recipe.cookTime || '');
+                rb.setAttribute('data-total', data.recipe.totalTime || '');
+                btn.setAttribute('data-recipename', data.recipe.name || '');
+            }
+            showToast('Meal swapped!');
+        }).catch(() => {
+            showToast('Failed to swap meal');
+        }).finally(() => { btn.disabled = false; btn.innerHTML = originalHTML; });
     }
 </script>
 
