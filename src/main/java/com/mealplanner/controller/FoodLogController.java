@@ -36,6 +36,7 @@ public class FoodLogController {
                              @RequestParam int protein,
                              @RequestParam int carbs,
                              @RequestParam int fat,
+                             @RequestParam(required = false, name = "timezone") String timezone,
                              RedirectAttributes redirectAttributes) {
         User user = resolveUser(principal);
         FoodLog foodLog = new FoodLog();
@@ -47,6 +48,11 @@ public class FoodLogController {
         foodLog.setCarbs(carbs);
         foodLog.setFat(fat);
         foodLog.setFromMealPlan(false);
+        try {
+            java.time.ZoneId zone = (timezone != null && !timezone.isBlank()) ? java.time.ZoneId.of(timezone) : java.time.ZoneId.systemDefault();
+            foodLog.setLogDate(java.time.LocalDate.now(zone));
+            foodLog.setTimeLogged(java.time.LocalDateTime.now(zone));
+        } catch (Exception ignore) {}
         foodLogService.addFoodLog(foodLog);
         redirectAttributes.addFlashAttribute("success", "Food logged successfully!");
         return "redirect:/dashboard";
@@ -60,6 +66,7 @@ public class FoodLogController {
                                        @RequestParam int protein,
                                        @RequestParam int carbs,
                                        @RequestParam int fat,
+                                       @RequestParam(required = false, name = "timezone") String timezone,
                                        RedirectAttributes redirectAttributes) {
         User user = resolveUser(principal);
         FoodLog foodLog = new FoodLog();
@@ -71,6 +78,11 @@ public class FoodLogController {
         foodLog.setCarbs(carbs);
         foodLog.setFat(fat);
         foodLog.setFromMealPlan(true);
+        try {
+            java.time.ZoneId zone = (timezone != null && !timezone.isBlank()) ? java.time.ZoneId.of(timezone) : java.time.ZoneId.systemDefault();
+            foodLog.setLogDate(java.time.LocalDate.now(zone));
+            foodLog.setTimeLogged(java.time.LocalDateTime.now(zone));
+        } catch (Exception ignore) {}
         foodLogService.addFoodLog(foodLog);
         redirectAttributes.addFlashAttribute("success", "Meal logged successfully!");
         return "redirect:/dashboard";

@@ -50,14 +50,33 @@ public class DashboardController {
         }
         List<com.mealplanner.model.SavedMealPlan> recent = mealPlanRepository.findTop10ByUserOrderByCreatedAtDesc(user);
         List<FoodLog> todaysFoodLogs = foodLogService.getTodaysFoodLogs(user);
-        Map<String, Integer> todaysTotals = foodLogService.calculateTodaysTotals(user);
+        Map<String, Integer> todaysTotals = new java.util.HashMap<>();
+        int tCal = 0, tP = 0, tC = 0, tF = 0;
+        for (FoodLog fl : todaysFoodLogs) {
+            tCal += fl.getCalories();
+            tP += fl.getProtein();
+            tC += fl.getCarbs();
+            tF += fl.getFat();
+        }
+        todaysTotals.put("calories", tCal);
+        todaysTotals.put("protein", tP);
+        todaysTotals.put("carbs", tC);
+        todaysTotals.put("fat", tF);
         com.mealplanner.model.SavedMealPlan latestPlan = recent.isEmpty() ? null : recent.get(0);
+        // Parse latest plan JSON for Quick Add modal
+        com.mealplanner.model.MealPlan latestMealPlan = null;
+        if (latestPlan != null && latestPlan.getMealPlanJson() != null) {
+            try {
+                latestMealPlan = new com.fasterxml.jackson.databind.ObjectMapper().readValue(latestPlan.getMealPlanJson(), com.mealplanner.model.MealPlan.class);
+            } catch (Exception ignore) {}
+        }
 
         model.addAttribute("user", user);
         model.addAttribute("savedPlans", recent);
         model.addAttribute("todaysFoodLogs", todaysFoodLogs);
         model.addAttribute("todaysTotals", todaysTotals);
         model.addAttribute("latestPlan", latestPlan);
+        model.addAttribute("latestMealPlan", latestMealPlan);
         model.addAttribute("userPreferences", preferencesService.getUserPreferences(user));
         return "dashboard";
     }

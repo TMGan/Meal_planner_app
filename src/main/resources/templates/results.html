@@ -249,7 +249,7 @@
         fetch('/food-log/quick-add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded', [csrf.header]: csrf.token },
-            body: body.toString()
+            body: body.toString() + '&timezone=' + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC')
         }).then(r => {
             if (r.ok) {
                 showToast('Meal added to today\'s log!');
