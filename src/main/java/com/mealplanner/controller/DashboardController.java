@@ -31,7 +31,7 @@ public class DashboardController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal OAuth2User principal, Model model, javax.servlet.http.HttpSession session) {
+    public String dashboard(@AuthenticationPrincipal OAuth2User principal, Model model, HttpSession session) {
         if (principal == null) return "redirect:/login";
         String email = principal.getAttribute("email");
         String googleId = principal.getAttribute("sub");
