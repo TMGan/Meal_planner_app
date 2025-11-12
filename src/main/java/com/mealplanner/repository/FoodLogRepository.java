@@ -21,4 +21,14 @@ public interface FoodLogRepository extends JpaRepository<FoodLog, Long> {
 
     @Query("SELECT COALESCE(SUM(f.calories),0), COALESCE(SUM(f.protein),0), COALESCE(SUM(f.carbs),0), COALESCE(SUM(f.fat),0) FROM FoodLog f WHERE f.user = :user AND f.logDate = :logDate")
     java.util.List<Object[]> calculateDailyTotals(@Param("user") User user, @Param("logDate") LocalDate logDate);
+
+    // Admin helpers
+    int countByUser(User user);
+
+    @Query("SELECT COUNT(DISTINCT f.user) FROM FoodLog f WHERE f.logDate = :date")
+    long countActiveUsersOnDate(@Param("date") LocalDate date);
+
+    List<FoodLog> findAllByOrderByLogDateDesc();
+
+    FoodLog findTopByUserOrderByLogDateDesc(User user);
 }

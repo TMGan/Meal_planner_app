@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Logs | Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin">
+<div class="admin-header">
+    <h1>⚡ FOOD LOGS</h1>
+    <nav class="admin-nav">
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/users">Users</a>
+        <a href="/admin/meal-plans">Meal Plans</a>
+        <a href="/admin/food-logs" class="active">Food Logs</a>
+    </nav>
+</div>
+<div class="admin-container">
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead><tr><th>User</th><th>Date</th><th>Food</th><th>Calories</th><th>P</th><th>C</th><th>F</th></tr></thead>
+            <tbody>
+            <tr th:each="entry : ${foodLogs}">
+                <td th:text="${entry.user.email}">user</td>
+                <td th:text="${entry.logDate}">date</td>
+                <td th:text="${entry.foodDescription}">desc</td>
+                <td th:text="${entry.calories}">0</td>
+                <td th:text="${entry.protein}">0</td>
+                <td th:text="${entry.carbs}">0</td>
+                <td th:text="${entry.fat}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
+

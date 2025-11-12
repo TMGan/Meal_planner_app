@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Users | Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin">
+<div class="admin-header">
+    <h1>⚡ USERS</h1>
+    <nav class="admin-nav">
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/users" class="active">Users</a>
+        <a href="/admin/meal-plans">Meal Plans</a>
+        <a href="/admin/food-logs">Food Logs</a>
+        <a href="/admin/ai-accuracy">AI Accuracy</a>
+    </nav>
+</div>
+<div class="admin-container">
+    <div class="search-bar">
+        <form action="/admin/users" method="get">
+            <input type="text" name="search" th:value="${search}" placeholder="Search by name or email..." autocomplete="off">
+        </form>
+    </div>
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Email</th><th>Signed Up</th><th>Last Active</th><th>Food Logs</th><th>Meal Plans</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr th:each="userStat : ${users}" th:with="user=${userStat.user}"
+                onclick="window.location.href='/admin/users/' + [[${user.id}]]" style="cursor:pointer;">
+                <td th:text="${user.id}">1</td>
+                <td th:text="${user.name}">Tim</td>
+                <td th:text="${user.email}">tim@example.com</td>
+                <td th:text="${user.createdAt}">date</td>
+                <td>
+                    <span th:if="${userStat.lastActive != null}" th:text="${userStat.lastActive}">date</span>
+                    <span th:unless="${userStat.lastActive != null}" class="badge badge-warning">Never</span>
+                </td>
+                <td th:text="${userStat.totalFoodLogs}">0</td>
+                <td th:text="${userStat.totalMealPlans}">0</td>
+                <td onclick="event.stopPropagation()">
+                    <a th:href="@{/admin/users/{id}(id=${user.id})}" class="btn-admin">View</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:if="${#lists.isEmpty(users)}" style="text-align:center; padding: 30px; opacity:.6;">No users found.</div>
+    </div>
+</div>
+</body>
+</html>
+

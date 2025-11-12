@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Plan Details | Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin">
+<div class="admin-header">
+    <h1>⚡ MEAL PLAN</h1>
+    <nav class="admin-nav">
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/meal-plans" class="active">Meal Plans</a>
+    </nav>
+</div>
+<div class="admin-container">
+    <div class="admin-table-container">
+        <h2 style="margin-top:0">Plan</h2>
+        <table class="admin-table">
+            <tbody>
+                <tr><th>ID</th><td th:text="${plan.id}">1</td></tr>
+                <tr><th>User</th><td th:text="${user.email}">email</td></tr>
+                <tr><th>Created</th><td th:text="${plan.createdAt}">date</td></tr>
+                <tr><th>Targets</th><td th:text="${plan.targetCalories} + ' cal | ' + ${plan.targetProtein} + 'P ' + ${plan.targetCarbs} + 'C ' + ${plan.targetFat} + 'F'">targets</td></tr>
+                <tr><th>Actuals</th><td th:text="${plan.actualCalories} + ' cal | ' + ${plan.actualProtein} + 'P ' + ${plan.actualCarbs} + 'C ' + ${plan.actualFat} + 'F'">actuals</td></tr>
+                <tr><th>Accuracy</th><td th:text="${plan.accuracyScore}">0</td></tr>
+                <tr><th>Failed</th><td th:text="${plan.generationFailed}">false</td></tr>
+                <tr th:if="${plan.errorMessage}"><th>Error</th><td th:text="${plan.errorMessage}">err</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
+

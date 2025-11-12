@@ -30,15 +30,23 @@ public class DashboardController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal OAuth2User principal, Model model) {
+    public String dashboard(@AuthenticationPrincipal OAuth2User principal, Model model, javax.servlet.http.HttpSession session) {
         if (principal == null) return "redirect:/login";
         String email = principal.getAttribute("email");
         String googleId = principal.getAttribute("sub");
         String name = principal.getAttribute("name");
         String picture = principal.getAttribute("picture");
         User user = null;
-        if (email != null) user = userRepository.findByEmail(email).orElse(null);
-        if (user == null && googleId != null) user = userRepository.findByGoogleId(googleId).orElse(null);
+        if (Boolean.TRUE.equals(session.getAttribute("impersonating"))) {
+            Object idObj = session.getAttribute("impersonateUserId");
+            if (idObj instanceof Long) {
+                user = userRepository.findById((Long) idObj).orElse(null);
+            }
+        }
+        if (user == null) {
+            if (email != null) user = userRepository.findByEmail(email).orElse(null);
+            if (user == null && googleId != null) user = userRepository.findByGoogleId(googleId).orElse(null);
+        }
         if (user == null) {
             // Fallback: create user record if missing to avoid redirect loops
             String em = (email != null) ? email : (googleId != null ? googleId + "@google.local" : "user@google.local");
@@ -78,6 +86,7 @@ public class DashboardController {
         model.addAttribute("latestPlan", latestPlan);
         model.addAttribute("latestMealPlan", latestMealPlan);
         model.addAttribute("userPreferences", preferencesService.getUserPreferences(user));
+        model.addAttribute("impersonating", Boolean.TRUE.equals(session.getAttribute("impersonating")));
         return "dashboard";
     }
 }

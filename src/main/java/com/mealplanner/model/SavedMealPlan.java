@@ -38,6 +38,21 @@ public class SavedMealPlan {
     @Column(columnDefinition = "TEXT")
     private String groceryListJson;
 
+    // Actual totals (optional, if computed post-generation)
+    private Integer actualCalories;
+    private Integer actualProtein;
+    private Integer actualCarbs;
+    private Integer actualFat;
+
+    // Accuracy score 0-100 (nullable)
+    private Double accuracyScore;
+
+    // Generation status
+    private boolean generationFailed = false;
+
+    @Column(columnDefinition = "TEXT")
+    private String errorMessage;
+
     public SavedMealPlan() {
         this.createdAt = LocalDateTime.now();
     }
@@ -74,5 +89,19 @@ public class SavedMealPlan {
     public void setMealPlanJson(String mealPlanJson) { this.mealPlanJson = mealPlanJson; }
     public String getGroceryListJson() { return groceryListJson; }
     public void setGroceryListJson(String groceryListJson) { this.groceryListJson = groceryListJson; }
-}
 
+    public Integer getActualCalories() { return actualCalories; }
+    public void setActualCalories(Integer actualCalories) { this.actualCalories = actualCalories; }
+    public Integer getActualProtein() { return actualProtein; }
+    public void setActualProtein(Integer actualProtein) { this.actualProtein = actualProtein; }
+    public Integer getActualCarbs() { return actualCarbs; }
+    public void setActualCarbs(Integer actualCarbs) { this.actualCarbs = actualCarbs; }
+    public Integer getActualFat() { return actualFat; }
+    public void setActualFat(Integer actualFat) { this.actualFat = actualFat; }
+    public Double getAccuracyScore() { return accuracyScore; }
+    public void setAccuracyScore(Double accuracyScore) { this.accuracyScore = accuracyScore; }
+    public boolean isGenerationFailed() { return generationFailed; }
+    public void setGenerationFailed(boolean generationFailed) { this.generationFailed = generationFailed; }
+    public String getErrorMessage() { return errorMessage; }
+    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+}

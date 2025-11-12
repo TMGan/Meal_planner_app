@@ -28,6 +28,15 @@ public class User {
 
     private LocalDateTime lastLoginAt;
 
+    @Column(name = "is_admin")
+    private boolean isAdmin = false;
+
+    // Optional timezone preference for admin/user pages
+    private String timezone;
+
+    // Tracks activity used in admin views
+    private LocalDateTime lastActiveAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SavedMealPlan> savedMealPlans = new ArrayList<>();
 
@@ -58,5 +67,13 @@ public class User {
     public void setLastLoginAt(LocalDateTime lastLoginAt) { this.lastLoginAt = lastLoginAt; }
     public List<SavedMealPlan> getSavedMealPlans() { return savedMealPlans; }
     public void setSavedMealPlans(List<SavedMealPlan> savedMealPlans) { this.savedMealPlans = savedMealPlans; }
-}
 
+    public boolean isAdmin() { return isAdmin; }
+    public void setAdmin(boolean admin) { isAdmin = admin; }
+
+    public String getTimezone() { return timezone; }
+    public void setTimezone(String timezone) { this.timezone = timezone; }
+
+    public LocalDateTime getLastActiveAt() { return lastActiveAt; }
+    public void setLastActiveAt(LocalDateTime lastActiveAt) { this.lastActiveAt = lastActiveAt; }
+}
