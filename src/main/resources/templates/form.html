@@ -251,7 +251,7 @@
         let recText = '30% Protein, 40% Carbs, 30% Fat';
         let goalText = 'your goal';
         if (g.includes('lose')) { recText = '35% Protein, 35% Carbs, 30% Fat'; goalText = 'losing weight'; }
-        else if (g.includes('build')) { recText = '30% Protein, 45% Carbs, 25% Fat'; goalText = 'building muscle'; }
+        else if (g.includes('build')) { recText = '30% Protein, 40% Carbs, 30% Fat goalText = 'building muscle'; }
         else if (g.includes('maintain')) { recText = '30% Protein, 40% Carbs, 30% Fat'; goalText = 'maintaining weight'; }
         const rg = document.getElementById('recommendedGoal'); if (rg) rg.textContent = goalText;
         const rs = document.getElementById('recommendedSplit'); if (rs) rs.textContent = recText;
@@ -295,8 +295,7 @@
         const g = (currentGoalValue() || '').toLowerCase();
         let p=30,c=40,f=30;
         if (g.includes('lose')) { p=35; c=35; f=30; }
-        else if (g.includes('build')) { p=30; c=45; f=25; }
-        else if (g.includes('maintain')) { p=30; c=40; f=30; }
+        else if (g.includes('build')) { p=30; c=40; f=30; }        else if (g.includes('maintain')) { p=30; c=40; f=30; }
         document.getElementById('proteinPercent').value = p;
         document.getElementById('carbsPercent').value = c;
         document.getElementById('fatPercent').value = f;

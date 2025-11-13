@@ -82,24 +82,32 @@ public class MacroCalculatorService {
         if (goal == null) return tdee;
         String g = goal.toLowerCase();
         if (g.contains("lose")) {
-            return tdee - 350; // deficit midpoint
+            // Updated: more aggressive deficit
+            return tdee - 500;
         } else if (g.contains("build") || g.contains("gain")) {
-            return tdee + 350; // surplus midpoint
+            // Updated: slightly less aggressive surplus
+            return tdee + 300;
         }
         return tdee; // maintain
     }
 
     public MacroTargets calculateMacros(double targetCalories) {
-        // 30/40/30 split
-        double proteinCalories = targetCalories * 0.30;
-        double carbCalories = targetCalories * 0.40;
-        double fatCalories = targetCalories * 0.30;
+        // Backward compatibility: default to maintenance split
+        return calculateMacrosByGoal(targetCalories, "maintain");
+    }
 
-        int protein = (int) Math.round(proteinCalories / 4.0);
-        int carbs = (int) Math.round(carbCalories / 4.0);
-        int fat = (int) Math.round(fatCalories / 9.0);
-        int calories = (int) Math.round(targetCalories);
-        return new MacroTargets(calories, protein, carbs, fat);
+    // New: Goal-specific macro calculation with updated splits
+    public MacroTargets calculateMacrosByGoal(double totalCalories, String goal) {
+        String g = goal == null ? "maintain" : goal.toLowerCase();
+        int p, c, f;
+        if (g.contains("lose")) {
+            p = 35; c = 35; f = 30; // 35/35/30 for weight loss
+        } else if (g.contains("build") || g.contains("gain")) {
+            p = 30; c = 40; f = 30; // 30/40/30 for build
+        } else {
+            p = 30; c = 40; f = 30; // 30/40/30 maintain
+        }
+        return calculateMacros(totalCalories, p, c, f);
     }
 
     // Customizable macro split using percentages (P/C/F must sum to 100)

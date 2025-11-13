@@ -345,7 +345,12 @@ public class MealPlanService {
                 "- Daily Carb Target: " + targets.getCarbs() + "g\n" +
                 "- Daily Fat Target: " + targets.getFat() + "g\n" +
                 "- Fitness Goal: " + profile.getFitnessGoal() + "\n" +
-                "- Allergies/Restrictions: " + allergies + "\n\n";
+                "- Allergies/Restrictions: " + allergies + "\n\n" +
+                "TARGET MACROS (strict per-day adherence):\n" +
+                "- Daily Calories: " + targets.getCalories() + " (match as closely as possible)\n" +
+                "- Daily Protein: " + targets.getProtein() + "g (±5g)\n" +
+                "- Daily Carbs: " + targets.getCarbs() + "g (±5g)\n" +
+                "- Daily Fat: " + targets.getFat() + "g (±3g)\n\n";
 
         String schema = "SCHEMA (exact keys):\n" +
                 "{\\n  \"days\": [\\n    {\\n      \"day\": number,\\n      \"meals\": [\\n        {\\n          \"name\\\": string,\\n          \"foods\\\": [ { \\\"item\\\": string, \\\"portion\\\": string } ],\\n          \"macros\\\": { \\\"calories\\\": number, \\\"protein\\\": number, \\\"carbs\\\": number, \\\"fat\\\": number },\\n          \"recipe\\\": { \\\"name\\\": string, \\\"ingredients\\\": [string], \\\"instructions\\\": [string], \\\"prepTime\\\": string, \\\"cookTime\\\": string, \\\"totalTime\\\": string }\\n        }\\n      ],\\n      \"dailyTotals\\\": { \\\"calories\\\": number, \\\"protein\\\": number, \\\"carbs\\\": number, \\\"fat\\\": number }\\n    }\\n  ]\\n}";
