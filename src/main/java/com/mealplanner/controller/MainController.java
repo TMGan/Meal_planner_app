@@ -60,6 +60,17 @@ public class MainController {
         return "form"; // templates/form.html
     }
 
+    @GetMapping("/create-plan-wizard")
+    public String createPlanWizard(Model model, @AuthenticationPrincipal OAuth2User principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("activityLevels", activityLevels());
+        model.addAttribute("goals", goals());
+        model.addAttribute("allergyOptions", allergyOptions());
+        return "create-plan-wizard";
+    }
+
     @PostMapping("/generate")
     public String generate(
             @AuthenticationPrincipal OAuth2User principal,
