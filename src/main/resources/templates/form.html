@@ -238,6 +238,30 @@
         return checked ? checked.value : '';
     }
 
+    function disableMacroSliders() {
+        const proteinEl = document.getElementById('proteinPercent');
+        const carbsEl = document.getElementById('carbsPercent');
+        const fatEl = document.getElementById('fatPercent');
+        [proteinEl, carbsEl, fatEl].forEach(el => {
+            if (el) {
+                el.disabled = true;
+                el.value = 0;
+            }
+        });
+        updateMacroSplit();
+    }
+
+    function enableMacroSliders() {
+        const proteinEl = document.getElementById('proteinPercent');
+        const carbsEl = document.getElementById('carbsPercent');
+        const fatEl = document.getElementById('fatPercent');
+        [proteinEl, carbsEl, fatEl].forEach(el => {
+            if (el) {
+                el.disabled = false;
+            }
+        });
+    }
+
     function updateRecommendedBanner() {
         const g = (currentGoalValue() || '').toLowerCase();
         const alertEl = document.getElementById('recommendedAlert');
@@ -250,9 +274,16 @@
         // Compute text based on goal
         let recText = '30% Protein, 40% Carbs, 30% Fat';
         let goalText = 'your goal';
-        if (g.includes('lose')) { recText = '35% Protein, 35% Carbs, 30% Fat'; goalText = 'losing weight'; }
-        else if (g.includes('build')) { recText = '30% Protein, 40% Carbs, 30% Fat goalText = 'building muscle'; }
-        else if (g.includes('maintain')) { recText = '30% Protein, 40% Carbs, 30% Fat'; goalText = 'maintaining weight'; }
+        if (g.includes('lose')) {
+            recText = '35% Protein, 35% Carbs, 30% Fat';
+            goalText = 'losing weight';
+        } else if (g.includes('build')) {
+            recText = '30% Protein, 40% Carbs, 30% Fat';
+            goalText = 'building muscle';
+        } else if (g.includes('maintain')) {
+            recText = '30% Protein, 40% Carbs, 30% Fat';
+            goalText = 'maintaining weight';
+        }
         const rg = document.getElementById('recommendedGoal'); if (rg) rg.textContent = goalText;
         const rs = document.getElementById('recommendedSplit'); if (rs) rs.textContent = recText;
         // Show after updating
@@ -293,18 +324,28 @@
 
     function resetToRecommended() {
         const g = (currentGoalValue() || '').toLowerCase();
-        let p=30,c=40,f=30;
-        if (g.includes('lose')) { p=35; c=35; f=30; }
-        else if (g.includes('build')) { p=30; c=40; f=30; }        else if (g.includes('maintain')) { p=30; c=40; f=30; }
+        if (!g) {
+            alert('Please select a fitness goal first');
+            return;
+        }
+        let p = 30, c = 40, f = 30;
+        if (g.includes('lose')) {
+            p = 35; c = 35; f = 30;
+        } else if (g.includes('build')) {
+            p = 30; c = 40; f = 30;
+        } else if (g.includes('maintain')) {
+            p = 30; c = 40; f = 30;
+        }
         document.getElementById('proteinPercent').value = p;
         document.getElementById('carbsPercent').value = c;
         document.getElementById('fatPercent').value = f;
         updateMacroSplit();
     }
 
-    // Update banner on goal change
+    // Update banner and sliders on goal change
     document.querySelectorAll('input[name="fitnessGoal"]').forEach(r => {
         r.addEventListener('change', () => {
+            enableMacroSliders();
             updateRecommendedBanner();
             resetToRecommended();
         })
@@ -324,7 +365,10 @@
     });
 
     // Initialize on load
-    document.addEventListener('DOMContentLoaded', function(){ updateRecommendedBanner(); updateMacroSplit(); });
+    document.addEventListener('DOMContentLoaded', function() {
+        disableMacroSliders();
+        updateRecommendedBanner();
+    });
 </script>
 
 <!-- Formula Information Modal -->
