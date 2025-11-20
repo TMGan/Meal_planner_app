@@ -1,171 +1,79 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${user.name} + ' | Admin - Retro Macros'">User Details</title>
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
-
-    <!-- Theme CSS -->
-    <link rel="stylesheet" th:href="@{/css/theme.css}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${user.name} + ' | Admin'">User Details</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
-<body class="neon">
+<body class="admin">
+<div class="admin-header">
+    <h1 th:text="'👤 ' + ${user.name}">User</h1>
+    <nav class="admin-nav">
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/users" class="active">Users</a>
+        <a href="/admin/meal-plans">Meal Plans</a>
+        <a href="/admin/food-logs">Food Logs</a>
+    </nav>
+</div>
+<div class="admin-container">
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Food Logs</div><div class="stat-value" th:text="${totalFoodLogs}">0</div></div>
+        <div class="stat-card"><div class="stat-label">Total Meal Plans</div><div class="stat-value" th:text="${totalMealPlans}">0</div></div>
+        <div class="stat-card"><div class="stat-label">Days Active</div><div class="stat-value" th:text="${daysActive}">0</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Macro Accuracy</div><div class="stat-value" th:text="${avgAccuracy} + '%'">0%</div></div>
+    </div>
 
-<div th:replace="~{fragments/navbar :: authenticated-navbar}"></div>
+    <div class="admin-table-container">
+        <h2 style="margin-top:0">Meal Plans</h2>
+        <table class="admin-table" th:if="${!#lists.isEmpty(mealPlans)}">
+            <thead><tr><th>Created</th><th>Target Cal</th><th>Macros (P/C/F)</th><th>Accuracy</th><th>Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="plan : ${mealPlans}">
+                <td th:text="${plan.createdAt}">date</td>
+                <td th:text="${plan.targetCalories} + ' cal'">0 cal</td>
+                <td th:text="${plan.targetProtein} + 'g / ' + ${plan.targetCarbs} + 'g / ' + ${plan.targetFat} + 'g'">0/0/0</td>
+                <td>
+                    <span th:if="${plan.accuracyScore != null && plan.accuracyScore >= 90}" class="badge badge-success" th:text="${plan.accuracyScore} + '%'">95%</span>
+                    <span th:if="${plan.accuracyScore != null && plan.accuracyScore < 90}" class="badge badge-danger" th:text="${plan.accuracyScore} + '%'">85%</span>
+                    <span th:unless="${plan.accuracyScore != null}" class="badge badge-warning">N/A</span>
+                </td>
+                <td><a th:href="@{/admin/meal-plans/{id}(id=${plan.id})}" class="btn-admin">View</a></td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:if="${#lists.isEmpty(mealPlans)}" style="opacity:.6">No meal plans generated yet.</div>
+    </div>
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
+    <div class="admin-table-container">
+        <h2 style="margin-top:0">Food Log History</h2>
+        <table class="admin-table" th:if="${!#lists.isEmpty(allFoodLogs)}">
+            <thead><tr><th>Date</th><th>Food</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th></tr></thead>
+            <tbody>
+            <tr th:each="entry : ${allFoodLogs}">
+                <td th:text="${entry.logDate}">date</td>
+                <td th:text="${entry.foodDescription}">food</td>
+                <td th:text="${entry.calories}">0</td>
+                <td th:text="${entry.protein}">0</td>
+                <td th:text="${entry.carbs}">0</td>
+                <td th:text="${entry.fat}">0</td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:if="${#lists.isEmpty(allFoodLogs)}" style="opacity:.6">No food logged yet.</div>
+    </div>
 
-            <h1 class="mb-4 section-title" th:text="${user.name}">User</h1>
-
-            <!-- User Stats Card -->
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-3">User Statistics</h3>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-label">Total Food Logs</div>
-                                <div class="stat-value" th:text="${totalFoodLogs}">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-label">Total Meal Plans</div>
-                                <div class="stat-value" th:text="${totalMealPlans}">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-label">Days Active</div>
-                                <div class="stat-value" th:text="${daysActive}">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-label">Avg Macro Accuracy</div>
-                                <div class="stat-value" th:text="${avgAccuracy} + '%'">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Meal Plans Card -->
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-3">Meal Plans</h3>
-                    <div class="table-responsive" th:if="${!#lists.isEmpty(mealPlans)}">
-                        <table class="table table-dark table-hover align-middle mb-0">
-                            <thead>
-                            <tr>
-                                <th>Created</th>
-                                <th>Target Cal</th>
-                                <th>Macros (P/C/F)</th>
-                                <th>Accuracy</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="plan : ${mealPlans}">
-                                <td th:text="${plan.createdAt}">date</td>
-                                <td th:text="${plan.targetCalories} + ' cal'">0 cal</td>
-                                <td th:text="${plan.targetProtein} + 'g / ' + ${plan.targetCarbs} + 'g / ' + ${plan.targetFat} + 'g'">
-                                    0/0/0
-                                </td>
-                                <td>
-                                    <span th:if="${plan.accuracyScore != null && plan.accuracyScore >= 90}"
-                                          class="badge bg-success" th:text="${plan.accuracyScore} + '%'">95%</span>
-                                    <span th:if="${plan.accuracyScore != null && plan.accuracyScore < 90}"
-                                          class="badge bg-danger" th:text="${plan.accuracyScore} + '%'">85%</span>
-                                    <span th:unless="${plan.accuracyScore != null}" class="badge bg-warning text-dark">N/A</span>
-                                </td>
-                                <td>
-                                    <a th:href="@{/admin/meal-plans/{id}(id=${plan.id})}" class="btn btn-neon btn-sm">View</a>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div th:if="${#lists.isEmpty(mealPlans)}" class="text-muted text-center py-3">
-                        No meal plans generated yet.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Food Logs Card -->
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-3">Food Log History</h3>
-                    <div class="table-responsive" th:if="${!#lists.isEmpty(allFoodLogs)}">
-                        <table class="table table-dark table-hover align-middle mb-0">
-                            <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Food</th>
-                                <th>Calories</th>
-                                <th>Protein</th>
-                                <th>Carbs</th>
-                                <th>Fat</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="entry : ${allFoodLogs}">
-                                <td th:text="${entry.logDate}">date</td>
-                                <td th:text="${entry.foodDescription}">food</td>
-                                <td th:text="${entry.calories}">0</td>
-                                <td th:text="${entry.protein}">0</td>
-                                <td th:text="${entry.carbs}">0</td>
-                                <td th:text="${entry.fat}">0</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div th:if="${#lists.isEmpty(allFoodLogs)}" class="text-muted text-center py-3">
-                        No food logged yet.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Admin Actions Card -->
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-3">Admin Actions</h3>
-                    <div class="d-flex flex-wrap gap-3">
-                        <form th:action="@{/admin/users/{id}/impersonate(id=${user.id})}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-neon">
-                                Impersonate User
-                            </button>
-                        </form>
-                        <a th:href="@{/admin/meal-plans(userId=${user.id})}" class="btn btn-outline-neon">
-                            View Their Meal Plans
-                        </a>
-                        <a th:href="@{/admin/food-logs(userId=${user.id})}" class="btn btn-outline-neon">
-                            View Their Food Logs
-                        </a>
-                        <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post"
-                              style="display:inline"
-                              onsubmit="return confirm('Delete this user and all data?')">
-                            <button type="submit" class="btn btn-outline-danger">
-                                Delete User
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <form th:action="@{/admin/users/{id}/impersonate(id=${user.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn-admin btn-success">🔀 Impersonate User</button>
+        </form>
+        <a th:href="@{/admin/meal-plans(userId=${user.id})}" class="btn-admin">View Their Meal Plans</a>
+        <a th:href="@{/admin/food-logs(userId=${user.id})}" class="btn-admin">View Their Food Logs</a>
+        <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" style="display:inline" onsubmit="return confirm('Delete this user and all data?')">
+            <button type="submit" class="btn-admin btn-danger">🗑️ Delete User</button>
+        </form>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
+

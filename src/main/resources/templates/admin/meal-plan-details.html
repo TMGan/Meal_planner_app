@@ -1,83 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Meal Plan Details - Retro Macros</title>
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
-
-    <!-- Theme CSS -->
-    <link rel="stylesheet" th:href="@{/css/theme.css}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Plan Details | Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
-<body class="neon">
-
-<div th:replace="~{fragments/navbar :: authenticated-navbar}"></div>
-
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-
-            <h1 class="mb-4 section-title">Meal Plan Details</h1>
-
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-3">Plan Summary</h3>
-                    <div class="table-responsive">
-                        <table class="table table-dark align-middle mb-0">
-                            <tbody>
-                            <tr>
-                                <th scope="row">ID</th>
-                                <td th:text="${plan.id}">1</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">User</th>
-                                <td th:text="${user.email}">email</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Created</th>
-                                <td th:text="${plan.createdAt}">date</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Targets</th>
-                                <td th:text="${plan.targetCalories} + ' cal | ' + ${plan.targetProtein} + 'P ' + ${plan.targetCarbs} + 'C ' + ${plan.targetFat} + 'F'">
-                                    targets
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Actuals</th>
-                                <td th:text="${plan.actualCalories} + ' cal | ' + ${plan.actualProtein} + 'P ' + ${plan.actualCarbs} + 'C ' + ${plan.actualFat} + 'F'">
-                                    actuals
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Accuracy</th>
-                                <td th:text="${plan.accuracyScore}">0</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Failed</th>
-                                <td th:text="${plan.generationFailed}">false</td>
-                            </tr>
-                            <tr th:if="${plan.errorMessage}">
-                                <th scope="row">Error</th>
-                                <td th:text="${plan.errorMessage}">err</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+<body class="admin">
+<div class="admin-header">
+    <h1>⚡ MEAL PLAN</h1>
+    <nav class="admin-nav">
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/meal-plans" class="active">Meal Plans</a>
+    </nav>
+</div>
+<div class="admin-container">
+    <div class="admin-table-container">
+        <h2 style="margin-top:0">Plan</h2>
+        <table class="admin-table">
+            <tbody>
+                <tr><th>ID</th><td th:text="${plan.id}">1</td></tr>
+                <tr><th>User</th><td th:text="${user.email}">email</td></tr>
+                <tr><th>Created</th><td th:text="${plan.createdAt}">date</td></tr>
+                <tr><th>Targets</th><td th:text="${plan.targetCalories} + ' cal | ' + ${plan.targetProtein} + 'P ' + ${plan.targetCarbs} + 'C ' + ${plan.targetFat} + 'F'">targets</td></tr>
+                <tr><th>Actuals</th><td th:text="${plan.actualCalories} + ' cal | ' + ${plan.actualProtein} + 'P ' + ${plan.actualCarbs} + 'C ' + ${plan.actualFat} + 'F'">actuals</td></tr>
+                <tr><th>Accuracy</th><td th:text="${plan.accuracyScore}">0</td></tr>
+                <tr><th>Failed</th><td th:text="${plan.generationFailed}">false</td></tr>
+                <tr th:if="${plan.errorMessage}"><th>Error</th><td th:text="${plan.errorMessage}">err</td></tr>
+            </tbody>
+        </table>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
+

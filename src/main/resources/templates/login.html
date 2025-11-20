@@ -11,28 +11,22 @@
 <body class="neon">
 <div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-6 mx-auto">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
             <div class="card neon">
                 <div class="card-body text-center">
-                    <h1 class="card-title mb-4 section-title">Sign In</h1>
-                    <p class="text-muted mb-4">
-                        Sign in with your Google account to get started with Retro Macros.
-                    </p>
-                    <a href="/oauth2/authorization/google" class="btn btn-neon btn-lg">
-                        <i class="bi bi-google me-2"></i> Sign in with Google
-                    </a>
+                    <h2 class="card-title mb-4 section-title">Sign In to Retro Macros</h2>
+                    <p class="text-muted mb-4">Sign in with your Google account to get started</p>
+                    <a href="/oauth2/authorization/google" class="btn btn-neon btn-lg"><i class="bi bi-google me-2"></i> Sign in with Google</a>
                     <div class="mt-4">
-                        <a href="/home" class="text-muted">
-                            <i class="bi bi-arrow-left me-1"></i> Back to Home
-                        </a>
+                        <a href="/home" class="text-muted"> <i class="bi bi-arrow-left me-1"></i> Back to Home</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    </div>
 </body>
 </html>
 

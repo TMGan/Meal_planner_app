@@ -1,134 +1,81 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Dashboard - Retro Macros</title>
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
-
-    <!-- Theme CSS -->
-    <link rel="stylesheet" th:href="@{/css/theme.css}" />
-</head>
-<body class="neon">
-
-<div th:replace="~{fragments/navbar :: authenticated-navbar}"></div>
-
-<div th:if="${session.impersonating}" class="bg-danger text-white text-center py-2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Retro Macros</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    </head>
+<body class="admin">
+<div th:if="${session.impersonating}" class="impersonation-banner">
     You are impersonating a user.
-    <a href="/admin/exit-impersonation" class="text-white text-decoration-underline ms-2">Exit Impersonation</a>
+    <a href="/admin/exit-impersonation">Exit Impersonation</a>
+    </div>
+<div class="admin-header">
+    <h1>⚡ RETRO MACROS ADMIN</h1>
+    <nav class="admin-nav">
+        <a href="/admin" class="active">Dashboard</a>
+        <a href="/admin/users">Users</a>
+        <a href="/admin/meal-plans">Meal Plans</a>
+        <a href="/admin/food-logs">Food Logs</a>
+        <a href="/admin/ai-accuracy">AI Accuracy</a>
+        <a href="/dashboard">← Exit Admin</a>
+    </nav>
 </div>
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-
-            <h1 class="mb-4 section-title">⚡ Admin Dashboard</h1>
-
-            <!-- System Stats Card -->
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-4">System Stats</h3>
-                    <div class="row g-3">
-                        <div class="col-md-4 col-lg-3">
-                            <div class="stat-box">
-                                <div class="stat-label">Total Users</div>
-                                <div class="stat-value" th:text="${totalUsers}">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-lg-3">
-                            <div class="stat-box">
-                                <div class="stat-label">New This Week</div>
-                                <div class="stat-value" th:text="${newUsersThisWeek}">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-lg-3">
-                            <div class="stat-box">
-                                <div class="stat-label">Active Today</div>
-                                <div class="stat-value" th:text="${activeToday}">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-lg-3">
-                            <div class="stat-box">
-                                <div class="stat-label">AI Success Rate</div>
-                                <div class="stat-value" th:text="${aiSuccessRate} + '%'">0%</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-lg-3">
-                            <div class="stat-box">
-                                <div class="stat-label">API Cost</div>
-                                <div class="stat-value" th:text="'$' + ${estimatedApiCost}">$0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-lg-3">
-                            <div class="stat-box">
-                                <div class="stat-label">Macro Accuracy</div>
-                                <div class="stat-value" th:text="${macroAccuracy} + '%'">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Sign-Ups Card -->
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-3">Recent Sign-Ups</h3>
-                    <div class="table-responsive">
-                        <table class="table table-dark table-hover align-middle mb-0">
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Signed Up</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="user : ${recentUsers}" onclick="window.location.href='/admin/users/' + [[${user.id}]]">
-                                <td th:text="${user.name}">User</td>
-                                <td th:text="${user.email}">user@email</td>
-                                <td th:text="${user.createdAt}">date</td>
-                                <td onclick="event.stopPropagation()">
-                                    <a th:href="@{/admin/users/{id}(id=${user.id})}" class="btn btn-neon btn-sm">View</a>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions Card -->
-            <div class="card neon mb-4">
-                <div class="card-body">
-                    <h3 class="card-title section-title mb-3">Quick Actions</h3>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="/admin/users" class="btn btn-neon">Manage Users</a>
-                        <a href="/admin/meal-plans" class="btn btn-neon">View Meal Plans</a>
-                        <a href="/admin/food-logs" class="btn btn-neon">View Food Logs</a>
-                        <a href="/admin/ai-accuracy" class="btn btn-neon">AI Accuracy</a>
-                        <a href="/admin/export/users" class="btn btn-neon">Export Users</a>
-                    </div>
-                </div>
-            </div>
-
+<div class="admin-container">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" th:text="${totalUsers}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">New This Week</div>
+            <div class="stat-value" th:text="${newUsersThisWeek}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Active Today</div>
+            <div class="stat-value" th:text="${activeToday}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">AI Success Rate</div>
+            <div class="stat-value" th:text="${aiSuccessRate} + '%'">0%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">API Cost</div>
+            <div class="stat-value" th:text="'$' + ${estimatedApiCost}">$0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Macro Accuracy</div>
+            <div class="stat-value" th:text="${macroAccuracy} + '%'">0%</div>
         </div>
     </div>
-</div>
 
-<footer class="bg-transparent text-white py-4 mt-5" style="border-top:1px solid rgba(45, 212, 255, 0.18);">
-    <div class="container text-center">
-        <p class="mb-0">&copy; 2025 Retro Macros</p>
+    <div class="admin-table-container">
+        <h2 style="margin-top:0">Recent Sign-Ups</h2>
+        <table class="admin-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Signed Up</th><th>Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="user : ${recentUsers}" onclick="window.location.href='/admin/users/' + [[${user.id}]]">
+                <td th:text="${user.name}">User</td>
+                <td th:text="${user.email}">user@email</td>
+                <td th:text="${user.createdAt}">date</td>
+                <td><a th:href="@{/admin/users/{id}(id=${user.id})}" class="btn-admin" onclick="event.stopPropagation()">View</a></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="/admin/users" class="btn-admin">View All Users</a>
+        <a href="/admin/meal-plans" class="btn-admin">View Meal Plans</a>
+        <a href="/admin/food-logs" class="btn-admin">View Food Logs</a>
+        <a href="/admin/ai-accuracy" class="btn-admin">Check AI Accuracy</a>
+        <a href="/admin/export/users" class="btn-admin btn-success">Export Users</a>
+    </div>
+</div>
 
 </body>
 </html>
+
