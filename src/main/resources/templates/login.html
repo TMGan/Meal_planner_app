@@ -18,18 +18,140 @@
                 <div class="card-body text-center">
                     <h2 class="card-title mb-4 section-title">Sign In to Retro Macros</h2>
                     <p class="text-muted mb-4">Sign in with your Google account to get started</p>
-                    <a href="/oauth2/authorization/google" class="btn btn-neon btn-lg"><i class="bi bi-google me-2"></i> Sign in with Google</a>
+
+                    <!-- Embedded Browser Warning -->
+                    <div id="embedded-browser-warning" style="display:none;">
+                        <div style="
+                            background: linear-gradient(135deg, #ff006e, #ff4500);
+                            color: white;
+                            padding: 30px;
+                            border-radius: 10px;
+                            text-align: center;
+                            margin-bottom: 30px;
+                            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+                        ">
+                            <h2 style="margin-top: 0; font-size: 24px;">⚠️ Please Open in Your Browser</h2>
+                            <p style="font-size: 16px; margin: 20px 0;">
+                                Google login doesn't work in embedded browsers (Messenger, Instagram, etc.)
+                            </p>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-top: 20px;">
+                                <p style="font-weight: bold; margin-bottom: 15px;">📱 How to Open in Your Browser:</p>
+
+                                <div style="text-align: left; max-width: 400px; margin: 0 auto;">
+                                    <p style="margin-bottom: 10px;">
+                                        <strong>iPhone/iPad:</strong><br>
+                                        Tap the <strong>Safari icon</strong> at the bottom right<br>
+                                        OR tap "..." and select "Open in Safari"
+                                    </p>
+
+                                    <p style="margin-bottom: 10px;">
+                                        <strong>Android:</strong><br>
+                                        Tap the <strong>3 dots</strong> (⋮) at the top right<br>
+                                        Select "Open in Chrome" or "Open in Browser"
+                                    </p>
+
+                                    <p style="margin-bottom: 10px;">
+                                        <strong>Or:</strong><br>
+                                        Copy this link and paste it into Safari or Chrome
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button onclick="copyToClipboard()" style="
+                                margin-top: 20px;
+                                padding: 15px 30px;
+                                background: white;
+                                color: #ff006e;
+                                border: none;
+                                border-radius: 8px;
+                                font-weight: bold;
+                                font-size: 16px;
+                                cursor: pointer;
+                            ">
+                                📋 Copy Link to Clipboard
+                            </button>
+                        </div>
+                    </div>
+
+                    <a href="/oauth2/authorization/google" class="btn btn-neon btn-lg">
+                        <i class="bi bi-google me-2"></i> Sign in with Google
+                    </a>
                     <div class="mt-4">
-                        <a href="/home" class="text-muted"> <i class="bi bi-arrow-left me-1"></i> Back to Home</a>
+                        <a href="/home" class="text-muted">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Home
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
+</div>
+
+<script>
+// Detect embedded browsers (Facebook, Instagram, Messenger, etc.)
+function isEmbeddedBrowser() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+
+    const isFacebook = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
+    const isInstagram = ua.indexOf('Instagram') > -1;
+    const isMessenger = ua.indexOf('Messenger') > -1;
+    const isTikTok = ua.indexOf('TikTok') > -1;
+    const isTwitter = ua.indexOf('Twitter') > -1;
+    const isLinkedIn = ua.indexOf('LinkedIn') > -1;
+
+    return isFacebook || isInstagram || isMessenger || isTikTok || isTwitter || isLinkedIn;
+}
+
+// Show warning if in embedded browser
+window.addEventListener('DOMContentLoaded', function() {
+    if (isEmbeddedBrowser()) {
+        const warning = document.getElementById('embedded-browser-warning');
+        if (warning) {
+            warning.style.display = 'block';
+        }
+
+        // Hide the Google login button (won't work anyway)
+        const loginButtons = document.querySelectorAll('a[href*="oauth2"], button[onclick*="google"]');
+        loginButtons.forEach(btn => {
+            btn.style.display = 'none';
+        });
+    }
+});
+
+function copyToClipboard() {
+    const url = window.location.href;
+
+    // Modern clipboard API
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function() {
+            alert('✅ Link copied! Now paste it into Safari or Chrome.');
+        }).catch(function() {
+            fallbackCopy(url);
+        });
+    } else {
+        fallbackCopy(url);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    try {
+        document.execCommand('copy');
+        alert('✅ Link copied! Now paste it into Safari or Chrome.');
+    } catch (err) {
+        alert('❌ Could not copy automatically. Please manually copy the URL from your address bar.');
+    }
+
+    document.body.removeChild(textarea);
+}
+</script>
 </body>
 </html>
-
-
-
 
