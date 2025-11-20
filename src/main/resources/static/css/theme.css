@@ -1,3 +1,26 @@
+/* ==========================================
+   GLOBAL FONT - ORBITRON EVERYWHERE
+   ========================================== */
+
+* {
+  font-family: 'Orbitron', sans-serif !important;
+}
+
+/* Ensure Google Font is loaded */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&display=swap');
+
+/* Override any Bootstrap or default fonts */
+body,
+h1, h2, h3, h4, h5, h6,
+p, span, div, a, button,
+input, select, textarea,
+.btn, .form-control, .form-select,
+.card, .card-title, .card-text,
+.nav-link, .navbar-brand,
+.dropdown-menu, .dropdown-item {
+  font-family: 'Orbitron', sans-serif !important;
+}
+
 /* Cyberpunk Neon Theme */
 :root {
   --bg: #0a0f1f;
@@ -315,3 +338,65 @@ a:hover { color: var(--neon-purple); text-shadow: 0 0 6px rgba(45,212,255,0.6); 
 
 /* Feature icon utility */
 .feature-icon { color: var(--neon-purple) !important; }
+
+/* ==========================================
+   ADMIN-SPECIFIC STYLES
+   ========================================== */
+
+/* Stat boxes for admin dashboard */
+.stat-box {
+  text-align: center;
+  padding: 20px;
+  background: rgba(45, 212, 255, 0.1);
+  border: 1px solid rgba(45, 212, 255, 0.3);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+  background: rgba(45, 212, 255, 0.2);
+  border-color: rgba(45, 212, 255, 0.6);
+  transform: translateY(-5px);
+}
+
+.stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(45, 212, 255, 0.7);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: bold;
+  color: #2dd4ff;
+  text-shadow: 0 0 10px rgba(45, 212, 255, 0.5);
+}
+
+/* Admin tables */
+.table-dark {
+  background-color: transparent !important;
+  color: #2dd4ff !important;
+}
+
+.table-dark thead th {
+  border-bottom: 2px solid rgba(45, 212, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 12px;
+}
+
+.table-dark tbody tr {
+  border-bottom: 1px solid rgba(45, 212, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.table-dark tbody tr:hover {
+  background: rgba(45, 212, 255, 0.1) !important;
+  transform: translateX(5px);
+}
+
+.table-dark td {
+  padding: 15px;
+}
