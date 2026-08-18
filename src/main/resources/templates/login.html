@@ -32,7 +32,11 @@
                         ">
                             <h2 style="margin-top: 0; font-size: 24px;">⚠️ Please Open in Your Browser</h2>
                             <p style="font-size: 16px; margin: 20px 0;">
-                                Google login doesn't work in embedded browsers (Messenger, Instagram, etc.)
+                                Google login doesn't work in embedded browsers (Messenger, Instagram, LinkedIn, etc.)
+                            </p>
+                            <p th:if="${@environment.getProperty('demo.enabled') == 'true'}"
+                               style="font-size: 16px; margin: 20px 0; font-weight: bold;">
+                                Just looking around? The "Explore the demo" button below works right here, no sign-in required.
                             </p>
 
                             <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-top: 20px;">
@@ -77,6 +81,19 @@
                     <a href="/oauth2/authorization/google" class="btn btn-neon btn-lg">
                         <i class="bi bi-google me-2"></i> Sign in with Google
                     </a>
+
+                    <div th:if="${@environment.getProperty('demo.enabled') == 'true'}" class="mt-4">
+                        <div class="text-muted mb-3" style="font-size: 0.9rem;">or</div>
+                        <form th:action="@{/demo-login}" method="post">
+                            <button type="submit" class="btn btn-outline-light btn-lg">
+                                Explore the demo
+                            </button>
+                        </form>
+                        <p class="text-muted mt-2" style="font-size: 0.85rem;">
+                            No sign-in needed. Loads a sample account with meal plans and food logs.
+                        </p>
+                    </div>
+
                     <div class="mt-4">
                         <a href="/home" class="text-muted">
                             <i class="bi bi-arrow-left me-1"></i> Back to Home
