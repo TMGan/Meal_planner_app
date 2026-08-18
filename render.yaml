@@ -1,0 +1,52 @@
+# Render Blueprint for Retro Macros.
+#
+# The database is NOT defined here on purpose: Render's free Postgres is deleted
+# after 30 days. Retro Macros uses a free Neon project instead, wired in through
+# the DATABASE_* env vars below.
+#
+# Setup:
+#   1. Create a free Postgres project at neon.tech, copy its connection details.
+#   2. In Render: New > Blueprint, point it at this repo.
+#   3. Fill in the env vars marked sync:false in the Render dashboard.
+#   4. Add https://<your-render-url>/login/oauth2/code/google as an authorized
+#      redirect URI in Google Cloud Console, or Google sign-in will dead-end.
+services:
+  - type: web
+    name: retro-macros
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /home
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # Neon connection. DATABASE_URL must be in JDBC form, for example:
+      #   jdbc:postgresql://ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+      # Neon shows a postgresql:// URL by default, so prefix it with "jdbc:" and
+      # move the user and password into the two vars below.
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+
+      # Public base URL, used to build the Google OAuth redirect URI.
+      # For example: https://retro-macros.onrender.com
+      - key: APP_URL
+        sync: false
+
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+
+      # Portfolio mode: no paid AI calls, demo button on.
+      # Both are already set in application-prod.properties; these are here so
+      # they can be flipped from the dashboard without a redeploy.
+      - key: AI_MOCK
+        value: "true"
+      - key: DEMO_ENABLED
+        value: "true"
