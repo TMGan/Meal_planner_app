@@ -123,8 +123,8 @@ body.neon {
 
 .macro-seg { height: 100%; float: left; }
 .macro-seg.protein { background: rgba(45, 212, 255, 0.7); }
-.macro-seg.carb { background: rgba(167, 139, 250, 0.7); }
-.macro-seg.fat { background: rgba(255, 140, 55, 0.7); }
+.macro-seg.carb { background: rgba(255, 209, 102, 0.75); }
+.macro-seg.fat { background: rgba(255, 93, 108, 0.75); }
 
 /* Day-level meal composition bar */
 .day-stack {
@@ -155,8 +155,8 @@ body.neon {
 /* Chips for macro numbers */
 .macro-chips .macro-badge { border: 1px solid rgba(255,255,255,0.2); color: var(--text); }
 .macro-badge.protein { background: rgba(45, 212, 255, 0.15); border-color: rgba(45, 212, 255, 0.45); }
-.macro-badge.carb { background: rgba(167, 139, 250, 0.18); border-color: rgba(167, 139, 250, 0.5); }
-.macro-badge.fat { background: rgba(255, 140, 55, 0.18); border-color: rgba(255, 140, 55, 0.5); }
+.macro-badge.carb { background: rgba(255, 209, 102, 0.16); border-color: rgba(255, 209, 102, 0.5); }
+.macro-badge.fat { background: rgba(255, 93, 108, 0.16); border-color: rgba(255, 93, 108, 0.5); }
 
 .section-title { font-family: 'Orbitron', 'Audiowide', system-ui, sans-serif; letter-spacing: 0.04em; }
 
@@ -356,3 +356,42 @@ a:hover { color: var(--neon-purple); text-shadow: 0 0 6px rgba(45,212,255,0.6); 
 .card.neon > .card-header h4 { color: var(--text); margin-bottom: 0.25rem; }
 .card.neon > .card-header strong { color: var(--neon-blue); font-weight: 600; }
 .card.neon > .card-header span { color: var(--text); }
+
+/* Macro colors, one scheme everywhere (matches dashboard progress bars):
+   calories = soft white, protein = cyan, carbs = amber, fat = coral.
+   Works standalone, not only inside .macro-chips. */
+.macro-badge { border: 1px solid rgba(255,255,255,0.2); color: var(--text); font-weight: 600; }
+.macro-badge.cal { background: rgba(230, 241, 255, 0.10); border-color: rgba(230, 241, 255, 0.35); }
+
+/* List groups (Quick Add modal rows) default to white */
+.neon .list-group-item {
+  background: rgba(45, 212, 255, 0.04);
+  border-color: rgba(167, 139, 250, 0.18);
+  color: var(--text);
+}
+.neon .list-group-item + .list-group-item { border-top-width: 0; }
+.neon .list-group-item-action:hover,
+.neon .list-group-item-action:focus { background: rgba(167, 139, 250, 0.12); color: var(--text); }
+.neon .list-group-item.active {
+  background: rgba(45, 212, 255, 0.18);
+  border-color: rgba(45, 212, 255, 0.5);
+  color: var(--text);
+}
+
+/* Secondary buttons (modal Cancel/Close) were flat Bootstrap gray */
+.neon .btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(230, 241, 255, 0.3);
+  color: var(--text);
+}
+.neon .btn-secondary:hover,
+.neon .btn-secondary:focus {
+  background: rgba(230, 241, 255, 0.08);
+  border-color: var(--neon-blue);
+  color: var(--text);
+  box-shadow: var(--glow);
+}
+
+/* Modals use the translucent card color, which let the page bleed through
+   behind popup content. Same hue, fully opaque. */
+.neon .modal-content { background: #141a30; }

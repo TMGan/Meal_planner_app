@@ -49,7 +49,9 @@
                 <div class="macro-seg carb" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, cPct)) + '%'}"></div>
                 <div class="macro-seg fat" th:style="${'width:' + T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, fPct)) + '%'}"></div>
             </div>
-            <div class="small text-muted">Daily macro split (target 30/40/30)</div>
+            <div class="small text-muted"
+                 th:with="tCal=${targets.calories == 0 ? 1 : targets.calories}"
+                 th:text="${'Daily macro split (target ' + T(java.lang.Math).round(targets.protein * 400.0 / tCal) + '/' + T(java.lang.Math).round(targets.carbs * 400.0 / tCal) + '/' + T(java.lang.Math).round(targets.fat * 900.0 / tCal) + ')'}">Daily macro split (target 30/40/30)</div>
         </div>
 
         <div class="row row-cols-1 row-cols-lg-2 g-3">
@@ -88,10 +90,10 @@
                             <li th:each="fi : ${meal.foods}" th:text="${fi.item + ' — ' + fi.portion}">3 large eggs — 1 cup oatmeal</li>
                         </ul>
                         <div>
-                            <span class="badge text-bg-secondary me-2" th:text="${'Cal ' + meal.macros.calories}">Cal 520</span>
-                            <span class="badge text-bg-primary me-2" th:text="${'P ' + meal.macros.protein + 'g'}">P 32g</span>
-                            <span class="badge text-bg-info me-2" th:text="${'C ' + meal.macros.carbs + 'g'}">C 58g</span>
-                            <span class="badge text-bg-warning" th:text="${'F ' + meal.macros.fat + 'g'}">F 18g</span>
+                            <span class="badge macro-badge cal me-2" th:text="${'Cal ' + meal.macros.calories}">Cal 520</span>
+                            <span class="badge macro-badge protein me-2" th:text="${'P ' + meal.macros.protein + 'g'}">P 32g</span>
+                            <span class="badge macro-badge carb me-2" th:text="${'C ' + meal.macros.carbs + 'g'}">C 58g</span>
+                            <span class="badge macro-badge fat" th:text="${'F ' + meal.macros.fat + 'g'}">F 18g</span>
                         </div>
 
                         <div class="mt-3"
@@ -377,7 +379,7 @@
                 data.suggestions.forEach(opt => {
                     const item = document.createElement('button');
                     item.className = 'list-group-item list-group-item-action';
-                    item.innerHTML = `<div class="d-flex justify-content-between"><strong>${opt.name}</strong><span class="badge text-bg-secondary">${opt.calories} cal</span></div><small class="text-muted">${opt.protein}g P | ${opt.carbs}g C | ${opt.fat}g F</small>`;
+                    item.innerHTML = `<div class="d-flex justify-content-between"><strong>${opt.name}</strong><span class="badge macro-badge cal">${opt.calories} cal</span></div><small class="text-muted">${opt.protein}g P | ${opt.carbs}g C | ${opt.fat}g F</small>`;
                     item.onclick = () => confirmSwap(mealName, original, opt.name);
                     list.appendChild(item);
                 });

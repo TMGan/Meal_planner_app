@@ -196,10 +196,10 @@
                             <div class="fw-bold" th:text="${meal.name}">Meal</div>
                             <div class="small text-muted" th:text="${meal.recipe != null ? meal.recipe.name : 'Meal from plan'}">Recipe Name</div>
                             <div class="mt-1">
-                                <span class="badge text-bg-secondary me-2" th:text="${'Cal ' + meal.macros.calories}">Cal 0</span>
-                                <span class="badge text-bg-primary me-2" th:text="${'P ' + meal.macros.protein + 'g'}">P 0g</span>
-                                <span class="badge text-bg-info me-2" th:text="${'C ' + meal.macros.carbs + 'g'}">C 0g</span>
-                                <span class="badge text-bg-warning" th:text="${'F ' + meal.macros.fat + 'g'}">F 0g</span>
+                                <span class="badge macro-badge cal me-2" th:text="${'Cal ' + meal.macros.calories}">Cal 0</span>
+                                <span class="badge macro-badge protein me-2" th:text="${'P ' + meal.macros.protein + 'g'}">P 0g</span>
+                                <span class="badge macro-badge carb me-2" th:text="${'C ' + meal.macros.carbs + 'g'}">C 0g</span>
+                                <span class="badge macro-badge fat" th:text="${'F ' + meal.macros.fat + 'g'}">F 0g</span>
                             </div>
                         </div>
                         <div>
@@ -391,10 +391,10 @@ function getRandomSuggestion() {
             document.getElementById('suggestionContent').innerHTML = `
                 <p class="mb-2"><strong>${data.foodDescription}</strong></p>
                 <div class="d-flex gap-3">
-                    <span class="badge text-bg-primary">${data.calories} cal</span>
-                    <span class="badge text-bg-info">${data.protein}g P</span>
-                    <span class="badge text-bg-warning text-dark">${data.carbs}g C</span>
-                    <span class="badge text-bg-danger">${data.fat}g F</span>
+                    <span class="badge macro-badge cal">${data.calories} cal</span>
+                    <span class="badge macro-badge protein">${data.protein}g P</span>
+                    <span class="badge macro-badge carb">${data.carbs}g C</span>
+                    <span class="badge macro-badge fat">${data.fat}g F</span>
                 </div>`;
             document.getElementById('finalFoodDescription').value = data.foodDescription;
             document.getElementById('calories').value = data.calories;
