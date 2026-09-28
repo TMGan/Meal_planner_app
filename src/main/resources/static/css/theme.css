@@ -302,16 +302,57 @@ a:hover { color: var(--neon-purple); text-shadow: 0 0 6px rgba(45,212,255,0.6); 
   border-color: var(--neon-blue);
 }
 
-/* Table polish to match theme */
+/* Table polish to match theme.
+   Bootstrap 5.3 paints each cell from --bs-table-* variables, and .table-dark
+   sets those to a flat charcoal (#212529). Setting a background on the table
+   element does nothing, so override the variables instead. */
 .neon .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text);
+  --bs-table-striped-bg: rgba(45, 212, 255, 0.045);
+  --bs-table-striped-color: var(--text);
+  --bs-table-hover-bg: rgba(167, 139, 250, 0.12);
+  --bs-table-hover-color: var(--text);
+  --bs-table-border-color: rgba(167, 139, 250, 0.16);
   color: var(--text);
-  border-color: rgba(255,255,255,0.12);
+  margin-bottom: 0;
 }
-.neon .table thead th { border-bottom-color: rgba(255,255,255,0.18); }
-.neon .table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(255,255,255,0.04);
+.neon .table > :not(caption) > * > * {
+  padding: 0.85rem 0.75rem;
+  vertical-align: middle;
 }
-.neon .table-dark { background-color: rgba(20,26,48,0.6); }
+.neon .table thead th {
+  background-color: rgba(45, 212, 255, 0.08);
+  color: var(--neon-blue);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(45, 212, 255, 0.35);
+  white-space: nowrap;
+}
+.neon .table thead th:first-child { border-top-left-radius: 8px; }
+.neon .table thead th:last-child { border-top-right-radius: 8px; }
+.neon .table tbody tr:last-child > * { border-bottom-width: 0; }
+.neon .table tbody tr { transition: background-color 0.15s ease; }
+.neon .table tbody tr:hover > * {
+  --bs-table-bg-state: var(--bs-table-hover-bg);
+}
+.neon .table .text-muted { font-size: 0.8rem; }
+
+/* Equal-width digits so macro numbers line up down each column */
+.neon .table td { font-variant-numeric: tabular-nums; }
 
 /* Feature icon utility */
 .feature-icon { color: var(--neon-purple) !important; }
+.neon .table td small { white-space: nowrap; }
+
+/* Card headers default to Bootstrap's dark text, which vanishes on navy */
+.card.neon > .card-header {
+  background: rgba(45, 212, 255, 0.05);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+  color: var(--muted);
+}
+.card.neon > .card-header h4 { color: var(--text); margin-bottom: 0.25rem; }
+.card.neon > .card-header strong { color: var(--neon-blue); font-weight: 600; }
+.card.neon > .card-header span { color: var(--text); }

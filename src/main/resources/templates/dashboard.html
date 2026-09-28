@@ -133,7 +133,7 @@
             <a href="/food-log/history" class="btn btn-outline-primary btn-sm"><i class="bi bi-calendar"></i> 7-Day History</a>
         </div>
         <div th:if="${todaysFoodLogs == null || todaysFoodLogs.isEmpty()}"><p class="text-muted">No foods logged yet today. Start tracking!</p></div>
-        <div th:if="${todaysFoodLogs != null && !todaysFoodLogs.isEmpty()}">
+        <div th:if="${todaysFoodLogs != null && !todaysFoodLogs.isEmpty()}" class="table-responsive">
             <table class="table table-dark table-striped">
                 <thead><tr><th>Time</th><th>Meal</th><th>Food</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Actions</th></tr></thead>
                 <tbody>
@@ -160,10 +160,13 @@
         </div>
     </div></div></div></div>
 
-    <div class="row"><div class="col-12">
-        <h3>Your Recent Meal Plans</h3>
+    <div class="row mb-5"><div class="col-12"><div class="card neon"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Your Recent Meal Plans</h3>
+            <a href="/my-plans" class="btn btn-outline-primary btn-sm"><i class="bi bi-list-ul"></i> All Plans</a>
+        </div>
         <div th:if="${savedPlans.isEmpty()}"><p class="text-muted">You haven't created any meal plans yet. Get started by creating one!</p></div>
-        <div th:if="${!savedPlans.isEmpty()}">
+        <div th:if="${!savedPlans.isEmpty()}" class="table-responsive">
             <table class="table table-dark table-striped">
                 <thead><tr><th>Date Created</th><th>Goal</th><th>Calories</th><th>Macros</th><th>Actions</th></tr></thead>
                 <tbody>
@@ -177,7 +180,7 @@
                 </tbody>
             </table>
         </div>
-    </div></div>
+    </div></div></div></div>
 </div>
 
 <!-- Quick Add Modal -->
