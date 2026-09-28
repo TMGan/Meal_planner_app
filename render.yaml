@@ -15,7 +15,7 @@ services:
     name: retro-macros
     runtime: docker
     plan: free
-    region: oregon
+    region: ohio
     dockerfilePath: ./Dockerfile
     healthCheckPath: /home
     envVars:
